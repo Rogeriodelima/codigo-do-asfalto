@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="padrao" data-fonte="md">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Código do Asfalto - Protótipo V1</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   TEMAS
+============================================= */
+[data-tema="padrao"] {
+  --fundo:       #070F1F;
+  --fundo2:      #0A1628;
+  --card:        #0D1B2E;
+  --card2:       #0B1929;
+  --borda:       rgba(255,255,255,0.07);
+  --borda-h:     rgba(242,183,5,0.28);
+  --t1:          #F0F4F8;
+  --t2:          #8FA3B8;
+  --t3:          #4A6278;
+  --am:          #F2B705;
+  --am-d:        #D9A204;
+  --am-g:        rgba(242,183,5,0.12);
+  --am-g2:       rgba(242,183,5,0.06);
+  --vm:          #FF1F1F;
+  --vd:          #22C55E;
+  --la:          #F97316;
+  --az:          #3B82F6;
+  --inp:         rgba(255,255,255,0.05);
+  --inp-b:       rgba(255,255,255,0.1);
+  --nav:         #0D1B2E;
+  --nav-b:       rgba(255,255,255,0.07);
+  --som:         0 4px 32px rgba(0,0,0,0.5);
+  --som-am:      0 0 28px rgba(242,183,5,0.2);
+  --scan:        rgba(11,31,58,0.2);
+  --sidebar:     #060D18;
+}
+[data-tema="dark"] {
+  --fundo:       #000;
+  --fundo2:      #0A0A0A;
+  --card:        #111;
+  --card2:       #0D0D0D;
+  --borda:       rgba(255,255,255,0.08);
+  --borda-h:     rgba(242,183,5,0.3);
+  --t1:          #F5F5F5;
+  --t2:          #999;
+  --t3:          #555;
+  --am:          #F2B705;
+  --am-d:        #D9A204;
+  --am-g:        rgba(242,183,5,0.1);
+  --am-g2:       rgba(242,183,5,0.05);
+  --vm:          #FF1F1F;
+  --vd:          #22C55E;
+  --la:          #F97316;
+  --az:          #3B82F6;
+  --inp:         rgba(255,255,255,0.06);
+  --inp-b:       rgba(255,255,255,0.1);
+  --nav:         #111;
+  --nav-b:       rgba(255,255,255,0.08);
+  --som:         0 4px 32px rgba(0,0,0,0.8);
+  --som-am:      0 0 28px rgba(242,183,5,0.15);
+  --scan:        rgba(0,0,0,0.3);
+  --sidebar:     #000;
+}
+[data-tema="light"] {
+  --fundo:       #F0F2F5;
+  --fundo2:      #E4E8ED;
+  --card:        #fff;
+  --card2:       #F8FAFB;
+  --borda:       rgba(0,0,0,0.08);
+  --borda-h:     rgba(217,162,4,0.4);
+  --t1:          #0B1F3A;
+  --t2:          #4A6278;
+  --t3:          #8FA3B8;
+  --am:          #D9A204;
+  --am-d:        #B88800;
+  --am-g:        rgba(217,162,4,0.12);
+  --am-g2:       rgba(217,162,4,0.06);
+  --vm:          #DC2626;
+  --vd:          #16A34A;
+  --la:          #EA6900;
+  --az:          #2563EB;
+  --inp:         #F4F6F9;
+  --inp-b:       rgba(0,0,0,0.1);
+  --nav:         #fff;
+  --nav-b:       rgba(0,0,0,0.07);
+  --som:         0 4px 24px rgba(0,0,0,0.08);
+  --som-am:      0 0 20px rgba(217,162,4,0.15);
+  --scan:        transparent;
+  --sidebar:     #0B1F3A;
+}
+
+/* FONTE */
+[data-fonte="sm"] { --e: 1;    --ef: 14px; }
+[data-fonte="md"] { --e: 1.15; --ef: 16px; }
+[data-fonte="lg"] { --e: 1.35; --ef: 18px; }
+
+/* =============================================
+   RESET E BASE
+============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--fundo);
+  color: var(--t1);
+  font-family: 'Montserrat', sans-serif;
+  font-size: var(--ef);
+  line-height: 1.65;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+[data-tema="padrao"] body::before,
+[data-tema="dark"] body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, var(--scan) 2px, var(--scan) 4px);
+  pointer-events: none; z-index: 0;
+}
+
+/* =============================================
+   TOPBAR
+============================================= */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 56px;
+  background: var(--card);
+  border-bottom: 1px solid var(--borda);
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 16px;
+  box-shadow: var(--som);
+}
+
+.topbar-marca {
+  font-family: 'Anton', sans-serif;
+  font-size: 15px; letter-spacing: 2px;
+  color: var(--am);
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.topbar-spacer { flex: 1; }
+
+.topbar-controles {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.ctrl-grupo { display: flex; align-items: center; gap: 6px; }
+.ctrl-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t3); white-space: nowrap; }
+
+.ctrl-btns { display: flex; gap: 3px; }
+.cb {
+  background: var(--inp); border: 1.5px solid var(--borda);
+  border-radius: 7px; padding: 5px 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px; font-weight: 700; color: var(--t3);
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.cb:hover { border-color: var(--am); color: var(--am); }
+.cb.on    { background: var(--am-g); border-color: var(--am); color: var(--am); }
+
+/* Telas nav no topbar */
+.tela-nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.tn {
+  background: var(--inp); border: 1.5px solid var(--borda);
+  border-radius: 7px; padding: 5px 9px;
+  font-size: 10px; font-weight: 700; color: var(--t3);
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.tn:hover { border-color: rgba(242,183,5,0.3); color: var(--t2); }
+.tn.on    { background: var(--am-g); border-color: var(--am); color: var(--am); }
+
+@media (max-width: 900px) {
+  .topbar-controles { gap: 8px; }
+  .ctrl-label { display: none; }
+  .tn { padding: 5px 7px; font-size: 9px; }
+}
+
+/* =============================================
+   LAYOUT RESPONSIVO
+   Desktop: sidebar fixa + conteudo
+   Mobile:  conteudo full + nav bottom
+============================================= */
+.app-layout {
+  display: flex;
+  padding-top: 56px;
+  min-height: 100vh;
+  position: relative; z-index: 1;
+}
+
+/* SIDEBAR - desktop */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--borda);
+  position: fixed;
+  top: 56px; left: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  padding: 24px 0;
+  transition: transform 0.3s;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+[data-tema="light"] .sidebar { background: var(--sidebar); }
+
+.sidebar-logo {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 16px;
+}
+
+[data-tema="light"] .sidebar-logo { border-bottom-color: rgba(255,255,255,0.1); }
+
+.sidebar-perfil {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 20px 20px;
+}
+
+.sidebar-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--am-g);
+  border: 2px solid rgba(242,183,5,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Anton', sans-serif; font-size: 14px; color: var(--am);
+  flex-shrink: 0;
+}
+
+.sidebar-nome { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.2; }
+.sidebar-nivel { font-size: 11px; color: var(--am); font-weight: 600; }
+
+[data-tema="light"] .sidebar-nome  { color: #fff; }
+[data-tema="light"] .sidebar-nivel { color: var(--am); }
+
+.sidebar-nav { padding: 0 12px; flex: 1; }
+
+.sidebar-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: 2px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px; font-weight: 600;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+.sidebar-item.on    { background: var(--am-g); color: var(--am); }
+.sidebar-item svg   { flex-shrink: 0; }
+
+[data-tema="light"] .sidebar-item { color: rgba(255,255,255,0.55); }
+[data-tema="light"] .sidebar-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+[data-tema="light"] .sidebar-item.on    { background: rgba(242,183,5,0.2); color: var(--am); }
+
+.sidebar-bottom {
+  padding: 16px 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 16px;
+}
+
+/* CONTEUDO principal */
+.app-content {
+  flex: 1;
+  margin-left: 240px;
+  min-height: calc(100vh - 56px);
+  display: flex; flex-direction: column;
+}
+
+/* Mobile: sem sidebar, com nav bottom */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .app-content { margin-left: 0; padding-bottom: 72px; }
+  .nav-bottom { display: flex; }
+}
+
+/* Desktop: sem nav bottom */
+@media (min-width: 769px) {
+  .nav-bottom { display: none !important; }
+  .sidebar { display: flex; }
+}
+
+/* =============================================
+   NAV BOTTOM - mobile
+============================================= */
+.nav-bottom {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--nav);
+  border-top: 1px solid var(--nav-b);
+  padding: 8px 0 max(16px, env(safe-area-inset-bottom));
+  display: none;
+}
+
+.nav-inner { display: flex; }
+
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  padding: 6px 4px; cursor: pointer; transition: all 0.2s;
+}
+.nav-item svg { transition: transform 0.2s; }
+.nav-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; color: var(--t3); }
+.nav-item.on svg { transform: translateY(-2px); }
+.nav-item.on .nav-lbl { color: var(--am); }
+.nav-dot { width: 4px; height: 4px; background: var(--am); border-radius: 50%; }
+
+/* =============================================
+   TELAS
+============================================= */
+.tela { display: none; flex-direction: column; flex: 1; }
+.tela.ativa { display: flex; }
+
+/* Header interno das telas */
+.tela-header {
+  padding: 24px 28px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--borda);
+  flex-shrink: 0;
+}
+.tela-titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: calc(22px * var(--e));
+  color: var(--t1);
+}
+.tela-acao {
+  font-size: 13px; color: var(--am); font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+}
+
+/* Scroll area */
+.tela-scroll {
+  flex: 1; overflow-y: auto; padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 20px;
+  scrollbar-width: thin; scrollbar-color: var(--borda) transparent;
+}
+
+@media (max-width: 768px) {
+  .tela-header { padding: 16px 18px 12px; }
+  .tela-scroll  { padding: 16px 18px; }
+}
+
+/* =============================================
+   COMPONENTES
+============================================= */
+
+/* Botoes */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: 'Montserrat', sans-serif; font-weight: 700;
+  font-size: calc(14px * var(--e));
+  border: none; cursor: pointer;
+  transition: all 0.2s; border-radius: 12px;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-primary   { background: var(--am); color: #070F1F; padding: 13px 24px; box-shadow: 0 4px 16px var(--am-g); }
+.btn-primary:hover { background: var(--am-d); transform: translateY(-1px); }
+.btn-secondary { background: transparent; color: var(--am); padding: 12px 24px; border: 2px solid var(--am); }
+.btn-secondary:hover { background: var(--am-g); }
+.btn-ghost     { background: var(--inp); color: var(--t1); padding: 12px 24px; border: 1.5px solid var(--borda); }
+.btn-ghost:hover { border-color: var(--am); }
+.btn-full { width: 100%; }
+.btn-sm   { padding: 9px 18px; font-size: calc(12px * var(--e)); border-radius: 9px; }
+
+/* Botao social */
+.btn-social {
+  width: 100%; padding: 13px 18px;
+  background: var(--inp); border: 1.5px solid var(--borda);
+  border-radius: 12px;
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'Montserrat', sans-serif; font-weight: 600;
+  font-size: calc(14px * var(--e)); color: var(--t1);
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-social:hover { border-color: var(--am); background: var(--am-g); }
+.btn-social-ico {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 18px;
+  transition: all 0.25s;
+}
+.card-p { padding: 20px; }
+.card:hover { border-color: var(--borda-h); }
+.card-hover:hover { transform: translateY(-2px); box-shadow: var(--som); }
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: calc(11px * var(--e)); font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+}
+.b-am { background: var(--am-g); color: var(--am); border: 1px solid rgba(242,183,5,0.25); }
+.b-vd { background: rgba(34,197,94,0.1); color: var(--vd); border: 1px solid rgba(34,197,94,0.2); }
+.b-vm { background: rgba(255,31,31,0.1); color: var(--vm); border: 1px solid rgba(255,31,31,0.2); }
+.b-la { background: rgba(249,115,22,0.1); color: var(--la); border: 1px solid rgba(249,115,22,0.2); }
+.b-az { background: rgba(59,130,246,0.1); color: var(--az); border: 1px solid rgba(59,130,246,0.2); }
+.b-mt { background: var(--inp); color: var(--t3); border: 1px solid var(--borda); }
+
+/* Inputs */
+.input-group { margin-bottom: 16px; }
+.input-label { display: block; font-size: calc(12px * var(--e)); font-weight: 700; color: var(--t2); margin-bottom: 7px; }
+.input, .sel, textarea {
+  width: 100%; background: var(--inp);
+  border: 2px solid var(--inp-b); border-radius: 12px;
+  padding: 13px 16px; color: var(--t1);
+  font-family: 'Montserrat', sans-serif;
+  font-size: calc(15px * var(--e));
+  transition: all 0.2s; outline: none;
+}
+.input::placeholder, textarea::placeholder { color: var(--t3); }
+.input:focus, .sel:focus, textarea:focus {
+  border-color: var(--am); background: var(--am-g2);
+  box-shadow: 0 0 0 3px rgba(242,183,5,0.08);
+}
+.sel { appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238FA3B8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-color: var(--inp);
+}
+.sel option { background: var(--card); }
+textarea { resize: none; }
+.icon-wrap { position: relative; }
+.icon-wrap .input { padding-left: 46px; }
+.inp-ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--t3); pointer-events: none; }
+
+/* Progresso */
+.prog-track { width: 100%; height: 8px; background: var(--inp); border-radius: 999px; overflow: hidden; }
+.prog-fill  { height: 100%; background: linear-gradient(90deg, var(--am), #F5C842); border-radius: 999px; box-shadow: 0 0 8px rgba(242,183,5,0.35); transition: width 1s ease; }
+
+/* Nivel dots */
+.ndots { display: flex; gap: 7px; }
+.ndot  { width: 10px; height: 10px; border-radius: 50%; background: var(--inp); border: 1.5px solid var(--borda); }
+.ndot.on { background: var(--am); border-color: var(--am); box-shadow: 0 0 6px rgba(242,183,5,0.4); }
+
+/* Chips */
+.chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chip-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0; padding: 7px 14px; border-radius: 999px;
+  font-size: calc(12px * var(--e)); font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  border: 1.5px solid var(--borda);
+  color: var(--t3); background: var(--inp); white-space: nowrap;
+}
+.chip.on, .chip:hover { background: var(--am-g); border-color: var(--am); color: var(--am); }
+
+/* Divider */
+.divider { height: 1px; background: var(--borda); margin: 16px 0; }
+
+/* Label secao */
+.sec-label {
+  font-size: calc(11px * var(--e)); font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--t3);
+  margin-bottom: 12px;
+}
+
+/* Grid */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+@media (max-width: 500px) { .g2, .g3 { grid-template-columns: 1fr 1fr; } }
+
+/* =============================================
+   TELA LOGIN - layout centralizado
+============================================= */
+#tela-login {
+  background: var(--fundo);
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 56px);
+  padding: 32px 20px;
+}
+
+.login-box {
+  width: 100%; max-width: 440px;
+  display: flex; flex-direction: column; gap: 0;
+}
+
+.login-hero { text-align: center; margin-bottom: 32px; }
+
+.login-logo-mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 72px; height: 72px;
+  background: var(--am-g); border: 1px solid rgba(242,183,5,0.2);
+  border-radius: 20px; margin-bottom: 16px;
+}
+
+.login-titulo {
+  font-family: 'Anton', sans-serif;
+  font-size: calc(28px * var(--e));
+  line-height: 1.05; color: var(--t1); margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: calc(12px * var(--e));
+  color: var(--t3); letter-spacing: 2px; text-transform: uppercase;
+}
+
+.login-convite {
+  background: var(--am-g); border: 1px solid rgba(242,183,5,0.2);
+  border-radius: 12px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px;
+  font-size: calc(13px * var(--e)); color: var(--am); font-weight: 600;
+}
+
+.login-tabs {
+  display: flex; background: var(--inp); border: 1px solid var(--borda);
+  border-radius: 12px; padding: 3px; margin-bottom: 24px;
+}
+.login-tab {
+  flex: 1; text-align: center; padding: 10px;
+  border-radius: 10px; font-size: calc(13px * var(--e)); font-weight: 700;
+  color: var(--t3); cursor: pointer; transition: all 0.2s;
+}
+.login-tab.on { background: var(--card); color: var(--t1); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+.login-form { display: flex; flex-direction: column; gap: 0; }
+
+.social-sep {
+  display: flex; align-items: center; gap: 12px;
+  margin: 16px 0; font-size: calc(12px * var(--e)); color: var(--t3);
+}
+.social-sep::before, .social-sep::after {
+  content: ''; flex: 1; height: 1px; background: var(--borda);
+}
+
+.social-btns { display: flex; flex-direction: column; gap: 10px; }
+
+/* Etapas do cadastro */
+.etapa { display: none; flex-direction: column; gap: 0; }
+.etapa.ativa { display: flex; }
+
+.etapa-indicator {
+  display: flex; gap: 6px; margin-bottom: 20px; align-items: center;
+}
+.etapa-dot {
+  width: 28px; height: 4px; border-radius: 999px;
+  background: var(--borda); transition: all 0.3s;
+}
+.etapa-dot.on { background: var(--am); }
+.etapa-label { font-size: 12px; color: var(--t3); font-weight: 600; margin-left: 4px; }
+
+/* =============================================
+   DASHBOARD
+============================================= */
+#tela-dashboard {}
+
+.dash-welcome {
+  padding: 24px 28px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+@media (max-width: 768px) { .dash-welcome { padding: 16px 18px 0; } }
+
+.dash-saudacao { font-size: calc(13px * var(--e)); color: var(--t3); margin-bottom: 2px; }
+.dash-nome { font-family: 'Anton', sans-serif; font-size: calc(24px * var(--e)); color: var(--t1); }
+
+.dash-avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--am-g); border: 2px solid rgba(242,183,5,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Anton', sans-serif; font-size: 17px; color: var(--am);
+}
+
+.nivel-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid rgba(242,183,5,0.2);
+  border-radius: 20px; padding: 20px;
+}
+
+.nivel-top {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 14px;
+}
+.nivel-label { font-size: calc(11px * var(--e)); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t3); margin-bottom: 2px; }
+.nivel-nome  { font-family: 'Anton', sans-serif; font-size: calc(20px * var(--e)); color: var(--t1); }
+.nivel-badge { background: var(--am); color: #070F1F; font-family: 'Anton', sans-serif; font-size: calc(18px * var(--e)); letter-spacing: 1px; padding: 6px 14px; border-radius: 999px; }
+
+.nivel-prog-row { display: flex; justify-content: space-between; font-size: calc(12px * var(--e)); font-weight: 600; color: var(--t3); margin-bottom: 8px; }
+.nivel-prog-pct { color: var(--am); }
+
+.stat-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 16px; padding: 18px; transition: all 0.25s; cursor: default;
+}
+.stat-card:hover { border-color: var(--borda-h); transform: translateY(-2px); }
+.stat-val   { font-family: 'Anton', sans-serif; font-size: calc(30px * var(--e)); color: var(--am); line-height: 1; margin-bottom: 4px; }
+.stat-lbl   { font-size: calc(11px * var(--e)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--t3); }
+.stat-delta { font-size: calc(11px * var(--e)); font-weight: 700; color: var(--vd); margin-top: 6px; }
+
+.acao-destaque {
+  background: var(--am); border-radius: 18px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(242,183,5,0.2);
+}
+.acao-destaque:hover { background: var(--am-d); transform: translateY(-1px); }
+.acao-titulo { font-family: 'Anton', sans-serif; font-size: calc(17px * var(--e)); color: #070F1F; margin-bottom: 2px; }
+.acao-sub    { font-size: calc(12px * var(--e)); color: rgba(7,15,31,0.6); font-weight: 600; }
+.acao-arr    { margin-left: auto; color: #070F1F; }
+
+.acoes-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 900px) { .acoes-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .acoes-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.acao-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 16px; padding: 16px;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.acao-card:hover { border-color: var(--borda-h); transform: translateY(-1px); }
+.acao-card-txt { font-size: calc(13px * var(--e)); font-weight: 700; color: var(--t1); }
+.acao-card-sub { font-size: calc(11px * var(--e)); color: var(--t3); }
+
+.sugestao-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 18px; padding: 18px;
+  display: flex; gap: 14px; align-items: flex-start;
+  cursor: pointer; transition: all 0.2s;
+}
+.sugestao-card:hover { border-color: var(--borda-h); }
+.sug-ico { width: 46px; height: 46px; border-radius: 12px; background: var(--am-g); border: 1px solid rgba(242,183,5,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--am); }
+.sug-label { font-size: calc(10px * var(--e)); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--am); margin-bottom: 3px; }
+.sug-titulo { font-size: calc(14px * var(--e)); font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+.sug-desc   { font-size: calc(12px * var(--e)); color: var(--t3); line-height: 1.55; }
+
+/* =============================================
+   PERFIL
+============================================= */
+.perfil-hero {
+  background: linear-gradient(180deg, var(--card2) 0%, transparent 100%);
+  padding: 28px; display: flex; align-items: flex-end; gap: 20px;
+}
+@media (max-width: 600px) { .perfil-hero { flex-direction: column; align-items: center; text-align: center; } }
+
+.perfil-avatar {
+  width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+  background: var(--am-g); border: 3px solid rgba(242,183,5,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Anton', sans-serif; font-size: 30px; color: var(--am);
+  box-shadow: 0 0 0 6px var(--am-g2);
+}
+
+.perfil-nome   { font-family: 'Anton', sans-serif; font-size: calc(22px * var(--e)); color: var(--t1); margin-bottom: 3px; }
+.perfil-loc    { font-size: calc(13px * var(--e)); color: var(--t3); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+.perfil-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.perfil-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--borda); border-radius: 16px; overflow: hidden; }
+.ps-item { background: var(--card); padding: 16px; text-align: center; }
+.ps-item + .ps-item { border-left: 1px solid var(--borda); }
+.ps-val { font-family: 'Anton', sans-serif; font-size: calc(22px * var(--e)); color: var(--am); }
+.ps-lbl { font-size: calc(10px * var(--e)); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--t3); margin-top: 2px; }
+
+.perfil-secao { background: var(--card); border: 1px solid var(--borda); border-radius: 16px; overflow: hidden; }
+.ps-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.ps-header-left { display: flex; align-items: center; gap: 10px; }
+.ps-header-txt { font-size: calc(14px * var(--e)); font-weight: 700; color: var(--t1); }
+.ps-body { padding: 0 16px 16px; border-top: 1px solid var(--borda); }
+.ps-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--borda); font-size: calc(13px * var(--e)); }
+.ps-row:last-child { border-bottom: none; }
+.ps-lbl-r { color: var(--t3); font-weight: 600; }
+.ps-val-r { color: var(--t1); font-weight: 700; }
+
+/* =============================================
+   CONTEUDO
+============================================= */
+.conteudo-lista { display: flex; flex-direction: column; gap: 14px; }
+
+.conteudo-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 18px; overflow: hidden;
+  cursor: pointer; transition: all 0.2s; display: flex;
+}
+.conteudo-card:hover { border-color: var(--borda-h); transform: translateY(-1px); }
+
+.conteudo-thumb {
+  width: 100px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--card2), var(--card));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--am);
+}
+
+.conteudo-info { padding: 16px; flex: 1; }
+.conteudo-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.conteudo-titulo { font-size: calc(14px * var(--e)); font-weight: 700; color: var(--t1); margin-bottom: 5px; line-height: 1.35; }
+.conteudo-desc   { font-size: calc(12px * var(--e)); color: var(--t3); line-height: 1.5; margin-bottom: 8px; }
+.conteudo-meta   { display: flex; gap: 12px; font-size: calc(11px * var(--e)); color: var(--t3); font-weight: 600; }
+
+@media (max-width: 500px) {
+  .conteudo-card { flex-direction: column; }
+  .conteudo-thumb { width: 100%; height: 100px; }
+}
+
+/* =============================================
+   EXPERIENCIAS
+============================================= */
+.exp-lista { display: flex; flex-direction: column; gap: 14px; }
+
+.exp-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 18px; padding: 18px;
+  cursor: pointer; transition: all 0.2s;
+}
+.exp-card:hover { border-color: var(--borda-h); transform: translateY(-1px); }
+
+.exp-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+.exp-ico { width: 42px; height: 42px; border-radius: 12px; background: var(--am-g); border: 1px solid rgba(242,183,5,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--am); }
+.exp-titulo { font-size: calc(15px * var(--e)); font-weight: 700; color: var(--t1); margin-bottom: 2px; }
+.exp-data   { font-size: calc(12px * var(--e)); color: var(--t3); font-weight: 600; }
+.exp-desc   { font-size: calc(13px * var(--e)); color: var(--t2); line-height: 1.55; margin-bottom: 12px; }
+.exp-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--borda); gap: 8px; flex-wrap: wrap; }
+.exp-meta   { display: flex; gap: 12px; flex-wrap: wrap; }
+.exp-meta-item { display: flex; align-items: center; gap: 5px; font-size: calc(11px * var(--e)); color: var(--t3); font-weight: 600; }
+
+/* Status de validação */
+.status-validacao {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: calc(11px * var(--e)); font-weight: 700;
+  padding: 5px 10px; border-radius: 999px;
+}
+.sv-pendente  { background: rgba(242,183,5,0.1);  color: #F2B705; border: 1px solid rgba(242,183,5,0.25); }
+.sv-validada  { background: rgba(34,197,94,0.1);  color: var(--vd); border: 1px solid rgba(34,197,94,0.2); }
+.sv-revisao   { background: rgba(59,130,246,0.1); color: var(--az); border: 1px solid rgba(59,130,246,0.2); }
+.sv-rejeitada { background: rgba(255,31,31,0.1);  color: var(--vm); border: 1px solid rgba(255,31,31,0.2); }
+
+/* FAB */
+.fab-wrap { position: relative; }
+.fab {
+  position: fixed; bottom: 88px; right: 24px;
+  width: 54px; height: 54px;
+  background: var(--am); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #070F1F;
+  box-shadow: 0 4px 20px rgba(242,183,5,0.35);
+  cursor: pointer; transition: all 0.2s; z-index: 50; border: none;
+}
+.fab:hover { background: var(--am-d); transform: scale(1.05); }
+@media (min-width: 769px) { .fab { bottom: 24px; } }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+  z-index: 300; display: none; align-items: flex-end;
+}
+@media (min-width: 769px) { .modal-overlay { align-items: center; justify-content: center; } }
+.modal-overlay.aberto { display: flex; }
+
+.modal {
+  width: 100%; max-width: 520px;
+  background: var(--fundo); border-radius: 28px 28px 0 0;
+  padding: 20px 24px 36px; max-height: 90vh; overflow-y: auto;
+}
+@media (min-width: 769px) { .modal { border-radius: 24px; } }
+
+.modal-handle { width: 40px; height: 4px; background: var(--borda); border-radius: 999px; margin: 0 auto 20px; }
+.modal-titulo { font-family: 'Anton', sans-serif; font-size: calc(20px * var(--e)); color: var(--t1); margin-bottom: 20px; }
+
+/* Evidencias */
+.evidencia-area {
+  border: 2px dashed var(--borda); border-radius: 12px;
+  padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;
+  margin-bottom: 16px;
+}
+.evidencia-area:hover { border-color: var(--am); background: var(--am-g2); }
+.evidencia-txt { font-size: calc(13px * var(--e)); color: var(--t3); margin-top: 8px; }
+.evidencia-tipos { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
+
+/* =============================================
+   TIMELINE
+============================================= */
+.timeline-wrap { position: relative; padding-left: 36px; }
+.timeline-wrap::before {
+  content: ''; position: absolute; left: 12px; top: 6px; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, var(--am) 0%, rgba(242,183,5,0.1) 80%, transparent 100%);
+}
+.tl-item  { position: relative; margin-bottom: 22px; }
+.tl-dot   { position: absolute; left: -30px; top: 5px; width: 16px; height: 16px; border-radius: 50%; background: var(--fundo); border: 2px solid var(--am); box-shadow: 0 0 0 4px var(--am-g2); }
+.tl-dot.on { background: var(--am); }
+.tl-data  { font-size: calc(11px * var(--e)); color: var(--t3); font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; text-transform: uppercase; }
+.tl-card  { background: var(--card); border: 1px solid var(--borda); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s; }
+.tl-card:hover { border-color: var(--borda-h); }
+.tl-card-titulo { font-size: calc(14px * var(--e)); font-weight: 700; color: var(--t1); margin-bottom: 3px; }
+.tl-card-desc   { font-size: calc(12px * var(--e)); color: var(--t3); margin-bottom: 8px; }
+.tl-card-tags   { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* =============================================
+   EVOLUCAO
+============================================= */
+.evo-nivel-card {
+  background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+  border: 1px solid rgba(242,183,5,0.2);
+  border-radius: 24px; padding: 28px; text-align: center;
+}
+.evo-num  { font-family: 'Anton', sans-serif; font-size: calc(80px * var(--e)); color: var(--am); line-height: 1; text-shadow: 0 0 40px rgba(242,183,5,0.25); margin-bottom: 4px; }
+.evo-nome { font-family: 'Anton', sans-serif; font-size: calc(20px * var(--e)); color: var(--t1); margin-bottom: 4px; }
+.evo-desc { font-size: calc(13px * var(--e)); color: var(--t3); margin-bottom: 20px; }
+.evo-prog-row { display: flex; justify-content: space-between; font-size: calc(12px * var(--e)); font-weight: 600; color: var(--t3); margin-bottom: 8px; }
+.evo-pct { color: var(--am); }
+
+.evo-passo {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 14px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px;
+}
+.evo-passo-ico { color: var(--am); flex-shrink: 0; }
+.evo-passo-txt { font-size: calc(13px * var(--e)); font-weight: 700; color: var(--t1); margin-bottom: 2px; }
+.evo-passo-sub { font-size: calc(11px * var(--e)); color: var(--t3); }
+
+.evo-hist-item {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: 12px; padding: 12px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.evo-hist-left { display: flex; align-items: center; gap: 10px; }
+.evo-hist-txt  { font-size: calc(13px * var(--e)); font-weight: 700; color: var(--t1); }
+.evo-hist-data { font-size: calc(11px * var(--e)); color: var(--t3); }
+.evo-hist-nivel{ font-family: 'Anton', sans-serif; font-size: calc(14px * var(--e)); color: var(--am); }
+
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     TOPBAR
+============================================= -->
+<div class="topbar">
+  <div class="topbar-marca">
+    <svg width="20" height="20" viewBox="0 0 40 40" fill="none">
+      <rect x="1" y="6" width="3" height="28" rx="1" fill="#F2B705" opacity=".3"/>
+      <rect x="6" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".5"/>
+      <rect x="10" y="6" width="4" height="28" rx="1" fill="#F2B705" opacity=".7"/>
+      <rect x="16" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".5"/>
+      <polygon points="20,6 39,6 39,34 20,34 29.5,20" fill="#F2B705"/>
+    </svg>
+    CDA
+  </div>
+
+  <div class="tela-nav" id="tela-nav">
+    <button class="tn" onclick="ir('login')">Login</button>
+    <button class="tn on" onclick="ir('dashboard')">Home</button>
+    <button class="tn" onclick="ir('perfil')">Perfil</button>
+    <button class="tn" onclick="ir('conteudo')">Conteudo</button>
+    <button class="tn" onclick="ir('experiencias')">Exp.</button>
+    <button class="tn" onclick="ir('timeline')">Timeline</button>
+    <button class="tn" onclick="ir('evolucao')">Evolucao</button>
+  </div>
+
+  <div class="topbar-spacer"></div>
+
+  <div class="topbar-controles">
+    <div class="ctrl-grupo">
+      <span class="ctrl-label">Tema</span>
+      <div class="ctrl-btns">
+        <button class="cb" onclick="setTema('light')"  id="bt-light">Claro</button>
+        <button class="cb on" onclick="setTema('padrao')" id="bt-padrao">Padrao</button>
+        <button class="cb" onclick="setTema('dark')"   id="bt-dark">Dark</button>
+      </div>
+    </div>
+    <div class="ctrl-grupo">
+      <span class="ctrl-label">Fonte</span>
+      <div class="ctrl-btns">
+        <button class="cb" onclick="setFonte('sm')" id="bf-sm" style="font-size:10px">A</button>
+        <button class="cb on" onclick="setFonte('md')" id="bf-md" style="font-size:13px">A</button>
+        <button class="cb" onclick="setFonte('lg')" id="bf-lg" style="font-size:16px">A</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     LAYOUT
+============================================= -->
+<div class="app-layout">
+
+  <!-- SIDEBAR - desktop -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div style="font-family:'Anton',sans-serif; font-size:13px; letter-spacing:3px; color:#F2B705; display:flex; align-items:center; gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 40 40" fill="none">
+          <rect x="1" y="6" width="3" height="28" rx="1" fill="#F2B705" opacity=".4"/>
+          <rect x="6" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".6"/>
+          <rect x="10" y="6" width="4" height="28" rx="1" fill="#F2B705" opacity=".8"/>
+          <rect x="16" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".6"/>
+          <polygon points="20,6 39,6 39,34 20,34 29.5,20" fill="#F2B705"/>
+        </svg>
+        CODIGO DO ASFALTO
+      </div>
+    </div>
+
+    <div class="sidebar-perfil">
+      <div class="sidebar-avatar">CM</div>
+      <div>
+        <div class="sidebar-nome">Carlos Mendes</div>
+        <div class="sidebar-nivel">Nivel 3 - Intermediario</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-item on" onclick="ir('dashboard')" id="si-dashboard">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        Inicio
+      </div>
+      <div class="sidebar-item" onclick="ir('conteudo')" id="si-conteudo">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        Conteudo
+      </div>
+      <div class="sidebar-item" onclick="ir('experiencias')" id="si-experiencias">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+        Experiencias
+      </div>
+      <div class="sidebar-item" onclick="ir('timeline')" id="si-timeline">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        Timeline
+      </div>
+      <div class="sidebar-item" onclick="ir('evolucao')" id="si-evolucao">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+        Evolucao
+      </div>
+      <div class="sidebar-item" onclick="ir('perfil')" id="si-perfil">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-item" style="color:rgba(255,100,100,0.7);">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTEUDO -->
+  <main class="app-content">
+
+    <!-- ===========================
+         TELA LOGIN
+    ============================ -->
+    <div class="tela" id="tela-login">
+      <div class="login-box">
+        <div class="login-hero">
+          <div class="login-logo-mark">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <rect x="1" y="6" width="3" height="28" rx="1" fill="#F2B705" opacity=".3"/>
+              <rect x="6" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".5"/>
+              <rect x="10" y="6" width="4" height="28" rx="1" fill="#F2B705" opacity=".8"/>
+              <rect x="16" y="6" width="2" height="28" rx="1" fill="#F2B705" opacity=".5"/>
+              <polygon points="20,6 39,6 39,34 20,34 29.5,20" fill="#F2B705"/>
+            </svg>
+          </div>
+          <div class="login-titulo">CODIGO DO<br>ASFALTO</div>
+          <div class="login-sub">Evolucao. Experiencia. Proposito.</div>
+        </div>
+
+        <div class="login-convite">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Comunidade fechada. Voce precisa de um convite para entrar.
+        </div>
+
+        <div class="login-tabs">
+          <div class="login-tab on" onclick="toggleTab('form-login')">Entrar</div>
+          <div class="login-tab" onclick="toggleTab('form-cadastro')">Criar conta</div>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="login-form" id="form-login">
+          <div class="input-group">
+            <label class="input-label">Email</label>
+            <div class="icon-wrap">
+              <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input class="input" type="email" placeholder="seu@email.com">
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Senha</label>
+            <div class="icon-wrap">
+              <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input class="input" type="password" placeholder="Sua senha">
+            </div>
+          </div>
+          <div style="text-align:right; margin-bottom:16px;">
+            <span style="font-size:calc(12px * var(--e)); color:var(--am); font-weight:700; cursor:pointer;">Esqueci minha senha</span>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="ir('dashboard')">Entrar</button>
+
+          <div class="social-sep">ou entre com</div>
+          <div class="social-btns">
+            <button class="btn-social" onclick="ir('dashboard')">
+              <div class="btn-social-ico" style="background:#fff;">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              </div>
+              Continuar com Google
+            </button>
+            <button class="btn-social" onclick="ir('dashboard')">
+              <div class="btn-social-ico" style="background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </div>
+              Continuar com Instagram
+            </button>
+          </div>
+        </div>
+
+        <!-- CADASTRO em etapas -->
+        <div class="login-form" id="form-cadastro" style="display:none;">
+
+          <div class="etapa-indicator">
+            <div class="etapa-dot on" id="ed1"></div>
+            <div class="etapa-dot" id="ed2"></div>
+            <div class="etapa-dot" id="ed3"></div>
+            <span class="etapa-label" id="etapa-label-txt">Etapa 1 de 3 - Validacao</span>
+          </div>
+
+          <!-- Etapa 1: Identidade -->
+          <div class="etapa ativa" id="etapa-1">
+            <div class="input-group">
+              <label class="input-label">Codigo de convite</label>
+              <div class="icon-wrap">
+                <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <input class="input" type="text" placeholder="Ex: CDA-2026-XXXX">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Email</label>
+              <div class="icon-wrap">
+                <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input class="input" type="email" placeholder="seu@email.com">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Celular (WhatsApp)</label>
+              <div class="icon-wrap">
+                <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 .82h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.08a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <input class="input" type="tel" placeholder="(47) 99999-0000">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="avancarEtapa(2)">Verificar e continuar</button>
+
+            <div class="social-sep">ou cadastre com</div>
+            <div class="social-btns">
+              <button class="btn-social" onclick="ir('dashboard')">
+                <div class="btn-social-ico" style="background:#fff;">
+                  <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                </div>
+                Google
+              </button>
+              <button class="btn-social" onclick="ir('dashboard')">
+                <div class="btn-social-ico" style="background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </div>
+                Instagram
+              </button>
+            </div>
+          </div>
+
+          <!-- Etapa 2: Dados basicos -->
+          <div class="etapa" id="etapa-2">
+            <div class="input-group">
+              <label class="input-label">Nome completo</label>
+              <div class="icon-wrap">
+                <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input class="input" type="text" placeholder="Seu nome completo">
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Crie uma senha</label>
+              <div class="icon-wrap">
+                <svg class="inp-ico" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <input class="input" type="password" placeholder="Minimo 8 caracteres">
+              </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-ghost" onclick="avancarEtapa(1)" style="flex:1;">Voltar</button>
+              <button class="btn btn-primary" onclick="avancarEtapa(3)" style="flex:2;">Continuar</button>
+            </div>
+          </div>
+
+          <!-- Etapa 3: Perfil do piloto -->
+          <div class="etapa" id="etapa-3">
+            <div style="background:var(--am-g); border:1px solid rgba(242,183,5,0.2); border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:calc(13px * var(--e)); color:var(--t2);">
+              Voce pode pular esta etapa e preencher depois. Mas seu score so começa a contar com o perfil completo.
+            </div>
+            <div class="input-group">
+              <label class="input-label">Modelo da sua moto</label>
+              <select class="sel">
+                <option value="">Selecione o modelo</option>
+                <option>BMW R 1250 GS</option>
+                <option>BMW R 1200 GS</option>
+                <option>BMW F 900 GS</option>
+                <option>Honda Africa Twin 1100</option>
+                <option>Triumph Tiger 900</option>
+                <option>Ducati Multistrada V4</option>
+                <option>Outra acima de 800cc</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Nivel de pilotagem (auto-percepcao)</label>
+              <select class="sel">
+                <option value="">Como voce se avalia?</option>
+                <option>Iniciante - menos de 2 anos na estrada</option>
+                <option>Basico - tenho alguma experiencia</option>
+                <option>Intermediario - piloto com regularidade</option>
+                <option>Avancado - muitos anos de estrada</option>
+                <option>Experiente - referencia entre amigos</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-ghost" onclick="avancarEtapa(2)" style="flex:1;">Voltar</button>
+              <button class="btn btn-primary" onclick="ir('dashboard')" style="flex:2;">Entrar na comunidade</button>
+            </div>
+            <button class="btn btn-ghost btn-full" style="margin-top:10px; font-size:calc(12px * var(--e));" onclick="ir('dashboard')">Pular por agora</button>
+          </div>
+
+        </div><!-- /form-cadastro -->
+
+      </div><!-- /login-box -->
+    </div>
+
+    <!-- ===========================
+         DASHBOARD
+    ============================ -->
+    <div class="tela ativa" id="tela-dashboard">
+      <div class="dash-welcome">
+        <div>
+          <div class="dash-saudacao">Bom dia,</div>
+          <div class="dash-nome">CARLOS</div>
+        </div>
+        <div class="dash-avatar">CM</div>
+      </div>
+
+      <div class="tela-scroll">
+        <div class="nivel-card">
+          <div class="nivel-top">
+            <div>
+              <div class="nivel-label">Seu nivel atual</div>
+              <div class="nivel-nome">Intermediario</div>
+            </div>
+            <div class="nivel-badge">N3</div>
+          </div>
+          <div class="nivel-prog-row">
+            <span>Progresso para N4</span>
+            <span class="nivel-prog-pct">68%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" style="width:68%"></div></div>
+          <div class="ndots" style="margin-top:14px;">
+            <div class="ndot on"></div><div class="ndot on"></div><div class="ndot on"></div><div class="ndot"></div><div class="ndot"></div>
+          </div>
+        </div>
+
+        <div class="g2">
+          <div class="stat-card">
+            <div class="stat-val">12</div>
+            <div class="stat-lbl">Experiencias</div>
+            <div class="stat-delta">+3 este mes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">4.280</div>
+            <div class="stat-lbl">km em 2026</div>
+            <div class="stat-delta">+320 esta semana</div>
+          </div>
+        </div>
+
+        <div class="acao-destaque" onclick="abrirModal()">
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#070F1F" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <div>
+            <div class="acao-titulo">REGISTRAR EXPERIENCIA</div>
+            <div class="acao-sub">Adicione sua ultima viagem ou evento</div>
+          </div>
+          <svg class="acao-arr" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+        </div>
+
+        <div class="sec-label">Acesso rapido</div>
+        <div class="acoes-grid">
+          <div class="acao-card" onclick="ir('timeline')">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+            <div class="acao-card-txt">Timeline</div>
+            <div class="acao-card-sub">12 registros</div>
+          </div>
+          <div class="acao-card" onclick="ir('evolucao')">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+            <div class="acao-card-txt">Evolucao</div>
+            <div class="acao-card-sub">N3 de 5</div>
+          </div>
+          <div class="acao-card" onclick="ir('conteudo')">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            <div class="acao-card-txt">Conteudo</div>
+            <div class="acao-card-sub">3 novos</div>
+          </div>
+          <div class="acao-card" onclick="ir('perfil')">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+            <div class="acao-card-txt">Minha moto</div>
+            <div class="acao-card-sub">BMW GS 1250</div>
+          </div>
+        </div>
+
+        <div class="sec-label">Recomendado para voce</div>
+        <div class="sugestao-card" onclick="ir('conteudo')">
+          <div class="sug-ico">
+            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>
+          </div>
+          <div>
+            <div class="sug-label">Recomendado N3</div>
+            <div class="sug-titulo">Pilotagem em curvas fechadas</div>
+            <div class="sug-desc">Com base no seu nivel, este conteudo pode acelerar sua evolucao para N4.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===========================
+         PERFIL
+    ============================ -->
+    <div class="tela" id="tela-perfil">
+      <div class="tela-header">
+        <div class="tela-titulo">MEU PERFIL</div>
+        <span class="tela-acao">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar
+        </span>
+      </div>
+
+      <div class="tela-scroll">
+        <div class="perfil-hero">
+          <div class="perfil-avatar">CM</div>
+          <div>
+            <div class="perfil-nome">Carlos Mendes</div>
+            <div class="perfil-loc">
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Joinville, SC
+            </div>
+            <div class="perfil-badges">
+              <span class="badge b-am">N3 Intermediario</span>
+              <span class="badge b-vd">Verificado</span>
+              <span class="badge b-mt">8 anos pilotando</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="perfil-stats-row">
+          <div class="ps-item"><div class="ps-val">12</div><div class="ps-lbl">Experiencias</div></div>
+          <div class="ps-item"><div class="ps-val">N3</div><div class="ps-lbl">Nivel</div></div>
+          <div class="ps-item"><div class="ps-val">4k</div><div class="ps-lbl">km/2026</div></div>
+        </div>
+
+        <div class="perfil-secao">
+          <div class="ps-header">
+            <div class="ps-header-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              <span class="ps-header-txt">Minha Moto</span>
+            </div>
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--t3)" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <div class="ps-body">
+            <div class="ps-row"><span class="ps-lbl-r">Modelo</span><span class="ps-val-r">BMW R 1250 GS</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Ano</span><span class="ps-val-r">2023</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Cor</span><span class="ps-val-r">Triple Black</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Ultima revisao</span><span class="ps-val-r">Abr 2026</span></div>
+          </div>
+        </div>
+
+        <div class="perfil-secao">
+          <div class="ps-header">
+            <div class="ps-header-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><path d="M16 13H8M16 17H8M10 9H8"/></svg>
+              <span class="ps-header-txt">Certificado Digital</span>
+            </div>
+            <span class="badge b-vd" style="font-size:10px;">Ativo</span>
+          </div>
+          <div class="ps-body">
+            <div class="ps-row"><span class="ps-lbl-r">Revisoes registradas</span><span class="ps-val-r">4</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Pecas documentadas</span><span class="ps-val-r">7</span></div>
+            <button class="btn btn-secondary btn-full" style="margin-top:10px;">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              Gerar QR Code de Venda
+            </button>
+          </div>
+        </div>
+
+        <div class="perfil-secao">
+          <div class="ps-header">
+            <div class="ps-header-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+              <span class="ps-header-txt">Preferencias</span>
+            </div>
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--t3)" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+          </div>
+          <div class="ps-body">
+            <div class="ps-row"><span class="ps-lbl-r">Nome exibido</span><span class="ps-val-r">Carlos</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Tamanho da fonte</span><span class="ps-val-r" style="color:var(--am);">Medio</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Tema visual</span><span class="ps-val-r" style="color:var(--am);">Padrao</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Contatos emergencia</span><span class="ps-val-r">2 cadastrados</span></div>
+            <div class="ps-row"><span class="ps-lbl-r">Convites disponiveis</span><span class="ps-val-r" style="color:var(--am);">3 convites</span></div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Gerar e Enviar Convite
+        </button>
+      </div>
+    </div>
+
+    <!-- ===========================
+         CONTEUDO
+    ============================ -->
+    <div class="tela" id="tela-conteudo">
+      <div class="tela-header">
+        <div class="tela-titulo">CONTEUDO</div>
+        <span class="tela-acao">Ver todos</span>
+      </div>
+      <div style="padding: 0 28px 8px;">
+        <div class="chip-row">
+          <div class="chip on">Para voce</div>
+          <div class="chip">Tecnica</div>
+          <div class="chip">Seguranca</div>
+          <div class="chip">Equipamentos</div>
+          <div class="chip">Manutencao</div>
+          <div class="chip">Rotas</div>
+        </div>
+      </div>
+      <div class="tela-scroll" style="padding-top:8px;">
+        <div class="conteudo-lista">
+          <div class="conteudo-card">
+            <div class="conteudo-thumb">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 17l2-4 4 2 4-6 4 8 2-4"/></svg>
+            </div>
+            <div class="conteudo-info">
+              <div class="conteudo-tags"><span class="badge b-am">N3</span><span class="badge b-mt">Tecnica</span></div>
+              <div class="conteudo-titulo">Pilotagem em curvas fechadas de montanha</div>
+              <div class="conteudo-desc">Como posicionar o corpo e gerenciar velocidade de entrada em curvas com raio fechado.</div>
+              <div class="conteudo-meta"><span>8 min</span><span>Recomendado</span></div>
+            </div>
+          </div>
+          <div class="conteudo-card">
+            <div class="conteudo-thumb">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="conteudo-info">
+              <div class="conteudo-tags"><span class="badge b-vd">Seguranca</span></div>
+              <div class="conteudo-titulo">Como escolher o capacete ideal para longas distancias</div>
+              <div class="conteudo-desc">Criterios tecnicos e de conforto para viagens acima de 300km.</div>
+              <div class="conteudo-meta"><span>12 min</span><span>Popular</span></div>
+            </div>
+          </div>
+          <div class="conteudo-card">
+            <div class="conteudo-thumb">
+              <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+            </div>
+            <div class="conteudo-info">
+              <div class="conteudo-tags"><span class="badge b-la">Manutencao</span></div>
+              <div class="conteudo-titulo">Revisao preventiva antes de uma grande viagem</div>
+              <div class="conteudo-desc">Checklist completo do que verificar antes de sair para longa distancia.</div>
+              <div class="conteudo-meta"><span>6 min</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===========================
+         EXPERIENCIAS
+    ============================ -->
+    <div class="tela" id="tela-experiencias">
+      <div class="tela-header">
+        <div class="tela-titulo">EXPERIENCIAS</div>
+        <span class="tela-acao">Filtrar</span>
+      </div>
+      <div style="padding: 0 28px 8px;">
+        <div class="chip-row">
+          <div class="chip on">Todas</div>
+          <div class="chip">Viagens</div>
+          <div class="chip">Eventos</div>
+          <div class="chip">Manutencao</div>
+          <div class="chip">Rotas</div>
+        </div>
+      </div>
+      <div class="tela-scroll" style="padding-top:8px;">
+        <div class="exp-lista">
+
+          <div class="exp-card">
+            <div class="exp-top">
+              <div style="display:flex; gap:10px; align-items:flex-start; flex:1;">
+                <div class="exp-ico">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 17l2-4 4 2 4-6 4 8 2-4"/></svg>
+                </div>
+                <div>
+                  <div class="exp-titulo">Serra do Rio do Rastro</div>
+                  <div class="exp-data">03 Mai 2026</div>
+                </div>
+              </div>
+              <span class="badge b-am">Viagem</span>
+            </div>
+            <div class="exp-desc">Subida tecnica com 285 curvas. Asfalto em excelente estado. Parada em Bom Jardim da Serra com o grupo.</div>
+            <div class="exp-footer">
+              <div class="exp-meta">
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  SC-438
+                </div>
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="5,12 12,5 19,12"/><path d="M12 5v14"/></svg>
+                  320 km
+                </div>
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                  8 pilotos
+                </div>
+              </div>
+              <span class="status-validacao sv-validada">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+                Validada
+              </span>
+            </div>
+          </div>
+
+          <div class="exp-card">
+            <div class="exp-top">
+              <div style="display:flex; gap:10px; align-items:flex-start; flex:1;">
+                <div class="exp-ico">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+                </div>
+                <div>
+                  <div class="exp-titulo">Revisao 10.000 km</div>
+                  <div class="exp-data">20 Abr 2026</div>
+                </div>
+              </div>
+              <span class="badge b-la">Manutencao</span>
+            </div>
+            <div class="exp-desc">Revisao completa na concessionaria. Troca de oleo, filtros e verificacao geral dos sistemas.</div>
+            <div class="exp-footer">
+              <div class="exp-meta">
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                  BMW Joinville
+                </div>
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+                  NF enviada
+                </div>
+              </div>
+              <span class="status-validacao sv-pendente">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                Em aprovacao
+              </span>
+            </div>
+          </div>
+
+          <div class="exp-card">
+            <div class="exp-top">
+              <div style="display:flex; gap:10px; align-items:flex-start; flex:1;">
+                <div class="exp-ico">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/></svg>
+                </div>
+                <div>
+                  <div class="exp-titulo">Encontro GS Club SC</div>
+                  <div class="exp-data">12 Abr 2026</div>
+                </div>
+              </div>
+              <span class="badge b-vd">Evento</span>
+            </div>
+            <div class="exp-desc">42 pilotos, rota pela Serra Gaucha, 580 km em dois dias com parada em Gramado.</div>
+            <div class="exp-footer">
+              <div class="exp-meta">
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                  42 pilotos
+                </div>
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="5,12 12,5 19,12"/><path d="M12 5v14"/></svg>
+                  580 km
+                </div>
+              </div>
+              <span class="status-validacao sv-revisao">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Em revisao
+              </span>
+            </div>
+          </div>
+
+          <div class="exp-card">
+            <div class="exp-top">
+              <div style="display:flex; gap:10px; align-items:flex-start; flex:1;">
+                <div class="exp-ico">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div>
+                  <div class="exp-titulo">Rota Litoral Sul SC</div>
+                  <div class="exp-data">28 Mar 2026</div>
+                </div>
+              </div>
+              <span class="badge b-mt">Rota</span>
+            </div>
+            <div class="exp-desc">480 km solo de Laguna a Florianopolis pelo litoral. Estrada excelente, sem intercorrencias.</div>
+            <div class="exp-footer">
+              <div class="exp-meta">
+                <div class="exp-meta-item">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="5,12 12,5 19,12"/><path d="M12 5v14"/></svg>
+                  480 km
+                </div>
+              </div>
+              <span class="status-validacao sv-rejeitada">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                Rejeitada
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <button class="fab" onclick="abrirModal()">
+        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- ===========================
+         TIMELINE
+    ============================ -->
+    <div class="tela" id="tela-timeline">
+      <div class="tela-header">
+        <div class="tela-titulo">TIMELINE</div>
+        <span class="tela-acao">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar
+        </span>
+      </div>
+      <div class="tela-scroll">
+        <div class="timeline-wrap">
+          <div class="tl-item">
+            <div class="tl-dot on"></div>
+            <div class="tl-data">03 MAI 2026</div>
+            <div class="tl-card">
+              <div class="tl-card-titulo">Serra do Rio do Rastro</div>
+              <div class="tl-card-desc">320 km - Viagem tecnica com grupo - N3 desbloqueado</div>
+              <div class="tl-card-tags"><span class="badge b-am">Viagem</span><span class="badge b-vd">+Nivel</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot on"></div>
+            <div class="tl-data">20 ABR 2026</div>
+            <div class="tl-card">
+              <div class="tl-card-titulo">Revisao 10.000 km</div>
+              <div class="tl-card-desc">BMW Joinville - Aguardando validacao</div>
+              <div class="tl-card-tags"><span class="badge b-la">Manutencao</span><span class="status-validacao sv-pendente" style="font-size:10px; padding:3px 8px;">Em aprovacao</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot on"></div>
+            <div class="tl-data">12 ABR 2026</div>
+            <div class="tl-card">
+              <div class="tl-card-titulo">Encontro GS Club SC</div>
+              <div class="tl-card-desc">42 pilotos - Serra Gaucha - 580 km</div>
+              <div class="tl-card-tags"><span class="badge b-vd">Evento</span><span class="status-validacao sv-revisao" style="font-size:10px; padding:3px 8px;">Em revisao</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot on"></div>
+            <div class="tl-data">28 MAR 2026</div>
+            <div class="tl-card">
+              <div class="tl-card-titulo">Rota Litoral Sul SC</div>
+              <div class="tl-card-desc">480 km solo - Laguna a Florianopolis</div>
+              <div class="tl-card-tags"><span class="badge b-mt">Rota</span><span class="status-validacao sv-rejeitada" style="font-size:10px; padding:3px 8px;">Rejeitada</span></div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-data" style="color:var(--t3);">PROXIMO PASSO</div>
+            <div class="tl-card" style="border-style:dashed; opacity:0.5;">
+              <div class="tl-card-titulo" style="color:var(--t3);">Registre sua proxima experiencia</div>
+              <div class="tl-card-desc">+1 exp para avancar ao Nivel 4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===========================
+         EVOLUCAO
+    ============================ -->
+    <div class="tela" id="tela-evolucao">
+      <div class="tela-header">
+        <div class="tela-titulo">EVOLUCAO</div>
+      </div>
+      <div class="tela-scroll">
+        <div class="evo-nivel-card">
+          <div class="evo-num">3</div>
+          <div class="evo-nome">PILOTO INTERMEDIARIO</div>
+          <div class="evo-desc">Voce tem consistencia e boa base tecnica</div>
+          <div class="evo-prog-row">
+            <span>Progresso para Nivel 4</span>
+            <span class="evo-pct">68%</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" style="width:68%"></div></div>
+          <div class="ndots" style="justify-content:center; margin-top:16px; gap:10px;">
+            <div class="ndot on" style="width:14px;height:14px;"></div>
+            <div class="ndot on" style="width:14px;height:14px;"></div>
+            <div class="ndot on" style="width:14px;height:14px;"></div>
+            <div class="ndot" style="width:14px;height:14px;"></div>
+            <div class="ndot" style="width:14px;height:14px;"></div>
+          </div>
+        </div>
+
+        <div class="sec-label">Para avancar ao Nivel 4</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="evo-passo">
+            <div class="evo-passo-ico">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="evo-passo-txt">Registre mais 2 experiencias</div>
+              <div class="evo-passo-sub">Voce tem 12 de 14 necessarias</div>
+            </div>
+            <span class="badge b-am" style="flex-shrink:0;">12/14</span>
+          </div>
+          <div class="evo-passo">
+            <div class="evo-passo-ico">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="evo-passo-txt">Consuma 1 conteudo de tecnica</div>
+              <div class="evo-passo-sub">Aprendizado acelera evolucao</div>
+            </div>
+            <span class="badge b-mt" style="flex-shrink:0;">0/1</span>
+          </div>
+          <div class="evo-passo">
+            <div class="evo-passo-ico">
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div class="evo-passo-txt">Use o app por 3 semanas seguidas</div>
+              <div class="evo-passo-sub">Consistencia e chave para evolucao</div>
+            </div>
+            <span class="badge b-vd" style="flex-shrink:0;">2/3</span>
+          </div>
+        </div>
+
+        <div class="sec-label">Historico de evolucao</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="evo-hist-item">
+            <div class="evo-hist-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--vd)" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+              <div><div class="evo-hist-txt">Avancou para Nivel 3</div><div class="evo-hist-data">03 Mai 2026</div></div>
+            </div>
+            <div class="evo-hist-nivel">N2 - N3</div>
+          </div>
+          <div class="evo-hist-item">
+            <div class="evo-hist-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--vd)" stroke-width="2"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
+              <div><div class="evo-hist-txt">Avancou para Nivel 2</div><div class="evo-hist-data">15 Jan 2026</div></div>
+            </div>
+            <div class="evo-hist-nivel">N1 - N2</div>
+          </div>
+          <div class="evo-hist-item">
+            <div class="evo-hist-left">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--am)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+              <div><div class="evo-hist-txt">Entrou na plataforma</div><div class="evo-hist-data">10 Nov 2025</div></div>
+            </div>
+            <div class="evo-hist-nivel">N1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /app-content -->
+
+</div><!-- /app-layout -->
+
+<!-- NAV BOTTOM mobile -->
+<div class="nav-bottom">
+  <div class="nav-inner">
+    <div class="nav-item on" onclick="ir('dashboard')" id="ni-dashboard">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      <div class="nav-lbl">Inicio</div>
+      <div class="nav-dot"></div>
+    </div>
+    <div class="nav-item" onclick="ir('conteudo')" id="ni-conteudo">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+      <div class="nav-lbl">Conteudo</div>
+    </div>
+    <div class="nav-item" onclick="ir('experiencias')" id="ni-experiencias">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg>
+      <div class="nav-lbl">Exp.</div>
+    </div>
+    <div class="nav-item" onclick="ir('timeline')" id="ni-timeline">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      <div class="nav-lbl">Timeline</div>
+    </div>
+    <div class="nav-item" onclick="ir('perfil')" id="ni-perfil">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="nav-lbl">Perfil</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL nova experiencia -->
+<div class="modal-overlay" id="modal-exp">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-titulo">Nova Experiencia</div>
+    <div class="input-group">
+      <label class="input-label">Tipo</label>
+      <select class="sel">
+        <option>Viagem</option><option>Evento</option><option>Rota</option><option>Manutencao</option><option>Encontro</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Titulo</label>
+      <input class="input" type="text" placeholder="Ex: Serra do Rio do Rastro">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Data</label>
+      <input class="input" type="date">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Descricao</label>
+      <textarea class="input" rows="3" placeholder="Conte como foi..."></textarea>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Evidencia</label>
+      <div class="evidencia-area">
+        <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="var(--t3)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="evidencia-txt">Toque para anexar nota fiscal, foto ou link</div>
+        <div class="evidencia-tipos">
+          <span class="badge b-mt">Nota fiscal</span>
+          <span class="badge b-mt">Foto</span>
+          <span class="badge b-mt">Link</span>
+          <span class="badge b-mt">GPS</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--am-g); border:1px solid rgba(242,183,5,0.2); border-radius:10px; padding:10px 14px; margin-bottom:16px; font-size:calc(12px * var(--e)); color:var(--t2);">
+      Sua experiencia fica com status "Em aprovacao" ate ser validada. A pontuacao e computada apos validacao.
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-ghost" onclick="fecharModal()" style="flex:1;">Cancelar</button>
+      <button class="btn btn-primary" onclick="fecharModal()" style="flex:2;">Enviar para validacao</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const NAV_IDS = {
+  dashboard:    ['ni-dashboard',    'si-dashboard'],
+  conteudo:     ['ni-conteudo',     'si-conteudo'],
+  experiencias: ['ni-experiencias', 'si-experiencias'],
+  timeline:     ['ni-timeline',     'si-timeline'],
+  evolucao:     ['ni-evolucao',     'si-evolucao'],
+  perfil:       ['ni-perfil',       'si-perfil'],
+};
+
+const TELAS_SEM_NAV = ['login'];
+
+function ir(tela) {
+  // Esconde telas
+  document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+  document.getElementById('tela-' + tela).classList.add('ativa');
+
+  // Nav bottom
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('on');
+    const dot = n.querySelector('.nav-dot');
+    if (dot) dot.style.display = 'none';
+  });
+
+  // Sidebar
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('on'));
+
+  if (!TELAS_SEM_NAV.includes(tela) && NAV_IDS[tela]) {
+    const [niId, siId] = NAV_IDS[tela];
+    if (niId) {
+      const ni = document.getElementById(niId);
+      if (ni) {
+        ni.classList.add('on');
+        const dot = ni.querySelector('.nav-dot');
+        if (dot) dot.style.display = 'block';
+      }
+    }
+    if (siId) {
+      const si = document.getElementById(siId);
+      if (si) si.classList.add('on');
+    }
+  }
+
+  // Botoes topbar
+  document.querySelectorAll('.tn').forEach(b => b.classList.remove('on'));
+  const map = { login:0, dashboard:1, perfil:2, conteudo:3, experiencias:4, timeline:5, evolucao:6 };
+  const tns = document.querySelectorAll('.tn');
+  if (tns[map[tela]]) tns[map[tela]].classList.add('on');
+
+  // Scroll ao topo
+  const scroll = document.querySelector('#tela-' + tela + ' .tela-scroll');
+  if (scroll) scroll.scrollTop = 0;
+}
+
+function setTema(t) {
+  document.documentElement.setAttribute('data-tema', t);
+  document.querySelectorAll('[id^="bt-"]').forEach(b => b.classList.remove('on'));
+  document.getElementById('bt-' + t).classList.add('on');
+  localStorage.setItem('cda-tema', t);
+}
+
+function setFonte(f) {
+  document.documentElement.setAttribute('data-fonte', f);
+  document.querySelectorAll('[id^="bf-"]').forEach(b => b.classList.remove('on'));
+  document.getElementById('bf-' + f).classList.add('on');
+  localStorage.setItem('cda-fonte', f);
+}
+
+function toggleTab(formId) {
+  document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('on'));
+  event.target.classList.add('on');
+  document.getElementById('form-login').style.display = 'none';
+  document.getElementById('form-cadastro').style.display = 'none';
+  document.getElementById(formId).style.display = formId === 'form-login' ? 'flex' : 'flex';
+  document.getElementById(formId).style.flexDirection = 'column';
+}
+
+function avancarEtapa(n) {
+  document.querySelectorAll('.etapa').forEach(e => e.classList.remove('ativa'));
+  document.getElementById('etapa-' + n).classList.add('ativa');
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('ed' + i);
+    if (dot) dot.classList.toggle('on', i <= n);
+  }
+  const labels = { 1: 'Etapa 1 de 3 - Validacao', 2: 'Etapa 2 de 3 - Seus dados', 3: 'Etapa 3 de 3 - Perfil do piloto' };
+  document.getElementById('etapa-label-txt').textContent = labels[n];
+}
+
+function abrirModal()  { document.getElementById('modal-exp').classList.add('aberto'); }
+function fecharModal() { document.getElementById('modal-exp').classList.remove('aberto'); }
+
+// Restaura preferencias
+const t = localStorage.getItem('cda-tema');
+const f = localStorage.getItem('cda-fonte');
+if (t) setTema(t);
+if (f) setFonte(f);
+
+// Inicia no dashboard
+ir('dashboard');
+</script>
+</body>
+</html>

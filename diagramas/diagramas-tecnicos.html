@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDA - Diagramas Técnicos V1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+<style>
+  :root {
+    --fundo:   #070F1F;
+    --card:    #0D1B2E;
+    --borda:   rgba(255,255,255,0.07);
+    --t1:      #F0F4F8;
+    --t2:      #8FA3B8;
+    --t3:      #4A6278;
+    --am:      #F2B705;
+    --am-g:    rgba(242,183,5,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--fundo);
+    color: var(--t1);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--card);
+    border-bottom: 1px solid var(--borda);
+    padding: 0 24px;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+
+  .topbar-marca {
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 800; font-size: 13px;
+    letter-spacing: 3px; color: var(--am);
+    white-space: nowrap;
+  }
+
+  .topbar-nav {
+    display: flex; gap: 4px; flex-wrap: wrap;
+  }
+
+  .tn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--borda);
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 11px; font-weight: 700;
+    color: var(--t3); cursor: pointer;
+    transition: all 0.2s; white-space: nowrap;
+    text-decoration: none;
+  }
+  .tn:hover { border-color: var(--am); color: var(--am); }
+
+  @media (max-width: 600px) {
+    .topbar-nav { display: none; }
+  }
+
+  /* LAYOUT */
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* CARD DE DIAGRAMA */
+  .diagrama-card {
+    background: var(--card);
+    border: 1px solid var(--borda);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .diagrama-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--borda);
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 16px;
+  }
+
+  .diagrama-titulo {
+    font-size: 18px; font-weight: 800;
+    color: var(--t1); margin-bottom: 4px;
+  }
+
+  .diagrama-desc {
+    font-size: 13px; color: var(--t3); line-height: 1.5;
+    max-width: 600px;
+  }
+
+  .diagrama-badge {
+    display: inline-flex; align-items: center;
+    background: var(--am-g); border: 1px solid rgba(242,183,5,0.2);
+    color: var(--am); font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* ZOOM CONTROLS */
+  .zoom-controls {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--borda);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .zoom-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--t3); margin-right: 4px;
+  }
+
+  .zoom-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--borda);
+    border-radius: 6px; padding: 5px 12px;
+    font-size: 13px; font-weight: 700;
+    color: var(--t2); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .zoom-btn:hover { border-color: var(--am); color: var(--am); }
+
+  .zoom-pct {
+    font-size: 12px; font-weight: 700;
+    color: var(--am); min-width: 40px; text-align: center;
+  }
+
+  .zoom-reset {
+    font-size: 11px; color: var(--t3);
+    cursor: pointer; margin-left: 4px;
+    transition: color 0.2s;
+  }
+  .zoom-reset:hover { color: var(--am); }
+
+  /* AREA DO DIAGRAMA */
+  .diagrama-area {
+    overflow: auto;
+    padding: 32px 24px;
+    cursor: grab;
+    min-height: 200px;
+  }
+  .diagrama-area:active { cursor: grabbing; }
+
+  .diagrama-inner {
+    transform-origin: top left;
+    transition: transform 0.2s ease;
+    display: inline-block;
+    min-width: 100%;
+  }
+
+  /* Mermaid overrides para tema escuro */
+  .mermaid svg {
+    background: transparent !important;
+  }
+
+  /* INFO BOXES */
+  .info-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--borda);
+    background: rgba(255,255,255,0.01);
+  }
+
+  .info-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .info-box-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--t3); margin-bottom: 4px;
+  }
+
+  .info-box-val {
+    font-size: 13px; font-weight: 700; color: var(--t1);
+  }
+
+  /* STATUS CORES */
+  .s-am { color: #F2B705; }
+  .s-vd { color: #22C55E; }
+  .s-az { color: #3B82F6; }
+  .s-vm { color: #FF1F1F; }
+
+  /* RODAPE */
+  .rodape {
+    text-align: center;
+    padding: 32px 0;
+    font-size: 12px; color: var(--t3);
+    border-top: 1px solid var(--borda);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-marca">CDA - DIAGRAMAS TECNICOS</div>
+  <nav class="topbar-nav">
+    <a class="tn" href="#cadastro">Cadastro</a>
+    <a class="tn" href="#validacao">Validacao</a>
+    <a class="tn" href="#estados">Estados</a>
+    <a class="tn" href="#dados">Modelo de Dados</a>
+    <a class="tn" href="#jornada">Jornada</a>
+    <a class="tn" href="#roadmap">Roadmap</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <!-- 1. FLUXO DE CADASTRO -->
+  <div class="diagrama-card" id="cadastro">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Fluxo de Cadastro e Convites</div>
+        <div class="diagrama-desc">Do membro ativo gerando o convite ate o score ser ativado. Inclui as 3 etapas do cadastro e a validacao do codigo de convite unico.</div>
+      </div>
+      <span class="diagrama-badge">flowchart</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d1', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d1">100%</span>
+      <button class="zoom-btn" onclick="zoom('d1', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d1')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d1">
+      <div class="diagrama-inner" id="d1">
+        <div class="mermaid">
+flowchart TD
+    A([Membro ativo]) --> B[Gera convite no app]
+    B --> C[Informa e-mail do convidado]
+    C --> D[Sistema gera codigo unico vinculado ao e-mail]
+    D --> E[Convidado recebe e-mail com codigo + link personalizado]
+    E --> F{Convidado acessa o link?}
+    F -- Nao --> G([Convite expira])
+    F -- Sim --> H
+
+    subgraph CADASTRO ["Cadastro em 3 Etapas"]
+        H[Etapa 1 - Identidade: e-mail, celular, codigo de convite]
+        H --> I{Codigo valido?}
+        I -- Nao --> J([Acesso negado])
+        I -- Sim --> K[Etapa 2 - Dados basicos: nome e senha]
+        K --> L[Etapa 3 - Perfil do piloto: moto e nivel - pode pular]
+    end
+
+    L --> M([Conta criada - vinculo registrado: quem indicou quem])
+    M --> N{Perfil completo?}
+    N -- Nao --> O[Score pausado ate completar perfil]
+    N -- Sim --> P([Score ativo - usuario comeca a acumular pontos])
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label">Regra central</div><div class="info-box-val">Codigo unico vinculado ao e-mail</div></div>
+      <div class="info-box"><div class="info-box-label">Score ativa quando</div><div class="info-box-val">Perfil completo</div></div>
+      <div class="info-box"><div class="info-box-label">Etapa 3</div><div class="info-box-val">Opcional - pode pular</div></div>
+    </div>
+  </div>
+
+  <!-- 2. FLUXO DE VALIDACAO -->
+  <div class="diagrama-card" id="validacao">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Fluxo de Validacao de Experiencias</div>
+        <div class="diagrama-desc">Do envio da experiencia ate a pontuacao ser computada. Inclui os 4 estados, o ciclo de correcao e o SLA de cada etapa.</div>
+      </div>
+      <span class="diagrama-badge">flowchart</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d2', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d2">100%</span>
+      <button class="zoom-btn" onclick="zoom('d2', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d2')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d2">
+      <div class="diagrama-inner" id="d2">
+        <div class="mermaid">
+flowchart TD
+    A([Usuario registra uma experiencia]) --> B[Anexa evidencia: nota fiscal, foto, GPS ou link]
+    B --> C[Experiencia entra em aprovacao]
+    C --> D[Notificacao enviada ao validador - imediata]
+    D --> E{Validador analisa - SLA 48h}
+
+    E -- Aprovada --> F([Validada - Pontuacao computada])
+    E -- Acertou de primeira --> G([Validada com destaque - Recompensa maior])
+    E -- Precisa de ajuste --> H[Em Revisao - Usuario recebe orientacao clara]
+
+    H --> I{Usuario responde?}
+    I -- Nao responde em 7 dias --> J([Rejeitada - Sem pontuacao])
+    I -- Envia correcao --> K[Nova notificacao ao validador]
+    K --> L{Validador reanálisa}
+    L -- Aprovada --> F
+    L -- Ainda incorreta --> J
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label">SLA validacao normal</div><div class="info-box-val">Ate 48 horas</div></div>
+      <div class="info-box"><div class="info-box-label">SLA resposta usuario</div><div class="info-box-val">Ate 7 dias</div></div>
+      <div class="info-box"><div class="info-box-label">Regra de ouro</div><div class="info-box-val">Errou, ajusta. Insistiu, penaliza.</div></div>
+      <div class="info-box"><div class="info-box-label">Bonus</div><div class="info-box-val">Acertou de primeira = recompensa maior</div></div>
+    </div>
+  </div>
+
+  <!-- 3. ESTADOS DE UMA EXPERIENCIA -->
+  <div class="diagrama-card" id="estados">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Estados de uma Experiencia</div>
+        <div class="diagrama-desc">Maquina de estados com todas as transicoes possiveis. O estado inicial e sempre Em Aprovacao - nunca ha validacao automatica na V1.</div>
+      </div>
+      <span class="diagrama-badge">stateDiagram</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d3', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d3">100%</span>
+      <button class="zoom-btn" onclick="zoom('d3', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d3')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d3">
+      <div class="diagrama-inner" id="d3">
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> EmAprovacao : Usuario registra experiencia + evidencia
+
+    EmAprovacao --> Validada : Validador aprova - Pontuacao computada
+    EmAprovacao --> ValidadaDestaque : Acertou de primeira - Recompensa maior
+    EmAprovacao --> EmRevisao : Precisa de ajuste ou documento adicional
+
+    EmRevisao --> EmAprovacao : Usuario envia correcao ou evidencia
+    EmRevisao --> Rejeitada : Usuario nao responde em 7 dias
+
+    EmAprovacao --> Rejeitada : Validador rejeita na segunda analise
+
+    Validada --> [*]
+    ValidadaDestaque --> [*]
+    Rejeitada --> [*]
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label"><span class="s-am">Em Aprovacao</span></div><div class="info-box-val">Aguardando analise - SLA 48h</div></div>
+      <div class="info-box"><div class="info-box-label"><span class="s-vd">Validada</span></div><div class="info-box-val">Score computado normalmente</div></div>
+      <div class="info-box"><div class="info-box-label"><span class="s-vd">Validada com Destaque</span></div><div class="info-box-val">Score com bonus - acertou de primeira</div></div>
+      <div class="info-box"><div class="info-box-label"><span class="s-az">Em Revisao</span></div><div class="info-box-val">Aguardando correcao - SLA 7 dias</div></div>
+      <div class="info-box"><div class="info-box-label"><span class="s-vm">Rejeitada</span></div><div class="info-box-val">Sem pontuacao - registro mantido</div></div>
+    </div>
+  </div>
+
+  <!-- 4. MODELO DE DADOS -->
+  <div class="diagrama-card" id="dados">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Modelo de Dados</div>
+        <div class="diagrama-desc">8 entidades principais com campos e relacionamentos. Desenhado para ser simples e funcional na V1 - sem complexidade desnecessaria.</div>
+      </div>
+      <span class="diagrama-badge">erDiagram</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d4', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d4">100%</span>
+      <button class="zoom-btn" onclick="zoom('d4', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d4')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d4">
+      <div class="diagrama-inner" id="d4">
+        <div class="mermaid">
+erDiagram
+    USUARIO {
+        int id PK
+        string nome
+        string email
+        string senha_hash
+        int nivel_atual
+        timestamp data_criacao
+    }
+    MOTO {
+        int id PK
+        int usuario_id FK
+        string modelo
+        string categoria
+        timestamp data_criacao
+    }
+    CONVITE {
+        int id PK
+        int gerado_por FK
+        string email_convidado
+        string codigo
+        string status
+        timestamp data_criacao
+        timestamp data_uso
+    }
+    EXPERIENCIA {
+        int id PK
+        int usuario_id FK
+        string tipo
+        string titulo
+        string descricao
+        date data
+        string status_validacao
+        timestamp data_criacao
+    }
+    EVIDENCIA {
+        int id PK
+        int experiencia_id FK
+        string tipo
+        string url
+        timestamp data_criacao
+    }
+    VALIDACAO {
+        int id PK
+        int experiencia_id FK
+        int validador_id FK
+        string acao
+        string observacao
+        timestamp data
+    }
+    EVOLUCAO {
+        int id PK
+        int usuario_id FK
+        int nivel_anterior
+        int nivel_atual
+        string motivo
+        date data
+    }
+    CONTEUDO {
+        int id PK
+        string titulo
+        string descricao
+        string tipo
+        int nivel_recomendado
+        timestamp data_criacao
+    }
+
+    USUARIO ||--o{ MOTO : "possui"
+    USUARIO ||--o{ EXPERIENCIA : "registra"
+    USUARIO ||--o{ EVOLUCAO : "acumula"
+    USUARIO ||--o{ CONVITE : "gera"
+    EXPERIENCIA ||--o{ EVIDENCIA : "tem"
+    EXPERIENCIA ||--o{ VALIDACAO : "recebe"
+    CONTEUDO }o--o{ USUARIO : "recomendado para"
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label">Entidade central</div><div class="info-box-val">USUARIO - tudo orbita em torno dele</div></div>
+      <div class="info-box"><div class="info-box-label">Total de entidades</div><div class="info-box-val">8 tabelas na V1</div></div>
+      <div class="info-box"><div class="info-box-label">Regra</div><div class="info-box-val">Se nao e necessario para V1, nao entra</div></div>
+    </div>
+  </div>
+
+  <!-- 5. JORNADA DO USUARIO -->
+  <div class="diagrama-card" id="jornada">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Jornada do Usuario</div>
+        <div class="diagrama-desc">Da recepcao do convite ate se tornar referencia na comunidade. 5 secoes com scores de satisfacao por etapa.</div>
+      </div>
+      <span class="diagrama-badge">journey</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d5', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d5">100%</span>
+      <button class="zoom-btn" onclick="zoom('d5', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d5')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d5">
+      <div class="diagrama-inner" id="d5">
+        <div class="mermaid">
+journey
+    title Jornada do Usuario - Codigo do Asfalto
+
+    section Descoberta
+      Recebe convite de um membro ativo: 5: Usuario
+      Abre o e-mail com link personalizado: 4: Usuario
+      Acessa a landing page do convite: 4: Usuario
+
+    section Cadastro
+      Valida identidade com codigo de convite: 3: Usuario
+      Informa nome e senha: 4: Usuario
+      Escolhe modelo da moto e nivel inicial: 4: Usuario
+      Completa perfil para ativar o score: 3: Usuario
+
+    section Primeira Experiencia
+      Explora o Dashboard: 4: Usuario
+      Recebe sugestao de conteudo por nivel: 5: Usuario
+      Registra primeira experiencia: 4: Usuario
+      Anexa evidencia e envia para validacao: 3: Usuario
+      Aguarda validacao ate 48h: 2: Usuario
+
+    section Evolucao Percebida
+      Experiencia validada - score sobe: 5: Usuario
+      Ve progresso na barra de nivel: 5: Usuario
+      Acompanha timeline da jornada: 4: Usuario
+      Recebe feedback de evolucao: 5: Usuario
+
+    section Engajamento Continuo
+      Registra mais experiencias: 4: Usuario
+      Consome conteudo direcionado: 4: Usuario
+      Avanca de nivel: 5: Usuario
+      Gera convite para outro piloto: 5: Usuario
+      Torna-se referencia na comunidade: 5: Usuario
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label">Momento critico</div><div class="info-box-val">Espera pela validacao - risco de abandono</div></div>
+      <div class="info-box"><div class="info-box-label">Ponto de virada</div><div class="info-box-val">Primeiro convite gerado = embaixador</div></div>
+      <div class="info-box"><div class="info-box-label">Score maximo</div><div class="info-box-val">Recepcao do convite e score subindo</div></div>
+    </div>
+  </div>
+
+  <!-- 6. ROADMAP -->
+  <div class="diagrama-card" id="roadmap">
+    <div class="diagrama-header">
+      <div>
+        <div class="diagrama-titulo">Roadmap V1 a V4</div>
+        <div class="diagrama-desc">4 fases sequenciais de mai/2026 a set/2027. A regra e simples: nao avancar de fase sem validar a anterior.</div>
+      </div>
+      <span class="diagrama-badge">gantt</span>
+    </div>
+    <div class="zoom-controls">
+      <span class="zoom-label">Zoom</span>
+      <button class="zoom-btn" onclick="zoom('d6', -0.15)">-</button>
+      <span class="zoom-pct" id="pct-d6">100%</span>
+      <button class="zoom-btn" onclick="zoom('d6', 0.15)">+</button>
+      <span class="zoom-reset" onclick="resetZoom('d6')">Resetar</span>
+    </div>
+    <div class="diagrama-area" id="area-d6">
+      <div class="diagrama-inner" id="d6">
+        <div class="mermaid">
+gantt
+    title Roadmap - Codigo do Asfalto
+    dateFormat YYYY-MM
+    axisFormat %b/%Y
+
+    section V1 - Validacao
+    Cadastro + Login              :done,    v1a, 2026-05, 1M
+    Perfil do usuario             :done,    v1b, 2026-05, 1M
+    Sistema de convites           :done,    v1g, 2026-05, 1M
+    Validacao de experiencias     :done,    v1h, 2026-05, 1M
+    Registro de experiencias      :active,  v1c, 2026-06, 1M
+    Timeline da jornada           :         v1d, 2026-06, 1M
+    Evolucao simples nivel 1-5    :         v1e, 2026-07, 1M
+    Conteudo curado inicial       :         v1f, 2026-07, 1M
+
+    section V2 - Engajamento
+    Melhoria da timeline          :         v2a, 2026-09, 2M
+    Evolucao mais refinada        :         v2b, 2026-09, 2M
+    Recomendacoes inteligentes    :         v2c, 2026-10, 2M
+    Comunidade inicial            :         v2d, 2026-11, 2M
+
+    section V3 - Monetizacao
+    Plano de assinatura           :         v3a, 2027-02, 2M
+    Funcionalidades premium       :         v3b, 2027-03, 2M
+    Diferenciacao gratuito pago   :         v3c, 2027-03, 2M
+
+    section V4 - Escala
+    Integracao com parceiros      :         v4a, 2027-07, 3M
+    Certificacao de piloto        :         v4b, 2027-08, 3M
+    IA de recomendacao            :         v4c, 2027-09, 3M
+        </div>
+      </div>
+    </div>
+    <div class="info-boxes">
+      <div class="info-box"><div class="info-box-label">V1 - Provar valor</div><div class="info-box-val">Mai a Jul 2026</div></div>
+      <div class="info-box"><div class="info-box-label">V2 - Criar habito</div><div class="info-box-val">Set a Dez 2026</div></div>
+      <div class="info-box"><div class="info-box-label">V3 - Monetizar</div><div class="info-box-val">Fev a Abr 2027</div></div>
+      <div class="info-box"><div class="info-box-label">V4 - Escalar</div><div class="info-box-val">Jul a Set 2027</div></div>
+    </div>
+  </div>
+
+  <div class="rodape">
+    Codigo do Asfalto - Diagramas Tecnicos V1 - Evolucao. Experiencia. Proposito.
+  </div>
+
+</div>
+
+<script>
+  // Mermaid config - tema escuro
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#0D1B2E',
+      primaryTextColor: '#F0F4F8',
+      primaryBorderColor: '#F2B705',
+      lineColor: '#F2B705',
+      secondaryColor: '#0A1628',
+      tertiaryColor: '#070F1F',
+      background: '#070F1F',
+      mainBkg: '#0D1B2E',
+      nodeBorder: '#F2B705',
+      clusterBkg: '#0A1628',
+      titleColor: '#F0F4F8',
+      edgeLabelBackground: '#0D1B2E',
+      actorBorder: '#F2B705',
+      actorBkg: '#0D1B2E',
+      actorTextColor: '#F0F4F8',
+      signalColor: '#F2B705',
+      signalTextColor: '#F0F4F8',
+      labelBoxBkgColor: '#0D1B2E',
+      labelBoxBorderColor: '#F2B705',
+      labelTextColor: '#F0F4F8',
+      loopTextColor: '#F0F4F8',
+      noteBorderColor: '#F2B705',
+      noteBkgColor: '#0A1628',
+      noteTextColor: '#F0F4F8',
+      fillType0: '#0D1B2E',
+      fillType1: '#0A1628',
+    },
+    flowchart: { curve: 'basis', padding: 20 },
+    gantt: { axisFormat: '%b/%Y' },
+    journey: { taskMargin: 20 },
+  });
+
+  // Estado de zoom por diagrama
+  const zoomState = { d1: 1, d2: 1, d3: 1, d4: 1, d5: 1, d6: 1 };
+
+  function zoom(id, delta) {
+    zoomState[id] = Math.min(3, Math.max(0.3, zoomState[id] + delta));
+    aplicarZoom(id);
+  }
+
+  function resetZoom(id) {
+    zoomState[id] = 1;
+    aplicarZoom(id);
+  }
+
+  function aplicarZoom(id) {
+    const el = document.getElementById(id);
+    const pct = document.getElementById('pct-' + id);
+    if (el) el.style.transform = `scale(${zoomState[id]})`;
+    if (pct) pct.textContent = Math.round(zoomState[id] * 100) + '%';
+  }
+
+  // Zoom com scroll do mouse
+  document.querySelectorAll('.diagrama-area').forEach(area => {
+    const id = area.id.replace('area-', '');
+    area.addEventListener('wheel', e => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        zoom(id, e.deltaY < 0 ? 0.1 : -0.1);
+      }
+    }, { passive: false });
+  });
+</script>
+
+</body>
+</html>
