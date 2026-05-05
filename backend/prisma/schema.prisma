@@ -1,0 +1,383 @@
+// =============================================================
+// Codigo do Asfalto - Schema Prisma Definitivo
+// Multi-tenant | Soft Delete | Auditoria | OAuth
+// Versao 2 - Equipamentos genericos (nao limitado a motos)
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================
+// TENANT
+// =============================================================
+
+model Tenant {
+  id                    Int       @id @default(autoincrement())
+  nome                  String
+  slug                  String    @unique
+  cor_primaria          String
+  cor_secundaria        String
+  logo_url              String?
+  dominio               String?
+  tipo_produto_padrao   TipoProduto @default(MOTO)
+  ativo                 Boolean   @default(true)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  deleted_at            DateTime?
+
+  usuarios              UsuarioTenant[]
+  equipamentos          Equipamento[]
+  convites              Convite[]
+  experiencias          Experiencia[]
+  evidencias            Evidencia[]
+  validacoes            Validacao[]
+  evolucoes             Evolucao[]
+  conteudos             Conteudo[]
+  configuracoes         ConfiguracaoCampo[]
+  logs                  AuditoriaLog[]
+
+  @@map("tenants")
+}
+
+// =============================================================
+// USUARIO
+// =============================================================
+
+model Usuario {
+  id               Int       @id @default(autoincrement())
+  nome             String
+  nome_exibido     String?
+  email            String    @unique
+  celular          String?
+  cpf              String?
+  senha_hash       String?
+  oauth_provider   String?
+  oauth_id         String?
+  foto_url         String?
+  email_verificado Boolean   @default(false)
+  ativo            Boolean   @default(true)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  deleted_at       DateTime?
+
+  tenants              UsuarioTenant[]
+  equipamentos         Equipamento[]
+  convites_gerados     Convite[]     @relation("ConviteGeradoPor")
+  convites_usados      Convite[]     @relation("ConviteUsadoPor")
+  experiencias         Experiencia[]
+  evolucoes            Evolucao[]
+  validacoes           Validacao[]
+  logs                 AuditoriaLog[]
+
+  @@map("usuarios")
+}
+
+// =============================================================
+// USUARIO TENANT (assinatura por marca)
+// =============================================================
+
+model UsuarioTenant {
+  id             Int                  @id @default(autoincrement())
+  usuario_id     Int
+  tenant_id      Int
+  nivel_atual    Int                  @default(1)
+  tenant_padrao  Boolean              @default(false)
+  status         StatusUsuarioTenant  @default(ATIVO)
+  created_at     DateTime             @default(now())
+  updated_at     DateTime             @updatedAt
+  deleted_at     DateTime?
+
+  usuario        Usuario  @relation(fields: [usuario_id], references: [id])
+  tenant         Tenant   @relation(fields: [tenant_id], references: [id])
+
+  @@unique([usuario_id, tenant_id])
+  @@map("usuario_tenants")
+}
+
+enum StatusUsuarioTenant {
+  ATIVO
+  SUSPENSO
+  CANCELADO
+}
+
+// =============================================================
+// EQUIPAMENTO (generico - moto, jet ski, bicicleta, etc)
+// =============================================================
+
+model Equipamento {
+  id            Int         @id @default(autoincrement())
+  usuario_id    Int
+  tenant_id     Int
+  tipo_produto  TipoProduto @default(MOTO)
+  modelo        String
+  categoria     String?
+  ano           Int?
+  cor           String?
+  identificador String?
+  foto_url      String?
+  ativo         Boolean     @default(true)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  deleted_at    DateTime?
+
+  usuario       Usuario  @relation(fields: [usuario_id], references: [id])
+  tenant        Tenant   @relation(fields: [tenant_id], references: [id])
+
+  @@map("equipamentos")
+}
+
+enum TipoProduto {
+  MOTO
+  JET_SKI
+  BICICLETA
+  CARRO
+  GOLF_SET
+  RAQUETE
+  OUTRO
+}
+
+// =============================================================
+// CONVITE
+// =============================================================
+
+model Convite {
+  id                 Int           @id @default(autoincrement())
+  tenant_id          Int
+  gerado_por         Int
+  email_convidado    String
+  celular_convidado  String?
+  codigo             String        @unique
+  status             StatusConvite @default(PENDENTE)
+  data_expiracao     DateTime
+  data_uso           DateTime?
+  usado_por          Int?
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @updatedAt
+  deleted_at         DateTime?
+
+  tenant             Tenant   @relation(fields: [tenant_id], references: [id])
+  gerador            Usuario  @relation("ConviteGeradoPor", fields: [gerado_por], references: [id])
+  usuario_uso        Usuario? @relation("ConviteUsadoPor", fields: [usado_por], references: [id])
+
+  @@map("convites")
+}
+
+enum StatusConvite {
+  PENDENTE
+  USADO
+  EXPIRADO
+  CANCELADO
+}
+
+// =============================================================
+// EXPERIENCIA
+// =============================================================
+
+model Experiencia {
+  id                    Int               @id @default(autoincrement())
+  usuario_id            Int
+  tenant_id             Int
+  tipo                  TipoExperiencia
+  titulo                String
+  descricao             String?
+  data                  DateTime
+  localizacao           String?
+  distancia_ou_duracao  String?
+  participantes         Int?
+  status_validacao      StatusValidacao   @default(EM_APROVACAO)
+  pontuacao             Int?
+  created_at            DateTime          @default(now())
+  updated_at            DateTime          @updatedAt
+  deleted_at            DateTime?
+
+  usuario               Usuario     @relation(fields: [usuario_id], references: [id])
+  tenant                Tenant      @relation(fields: [tenant_id], references: [id])
+  evidencias            Evidencia[]
+  validacoes            Validacao[]
+
+  @@map("experiencias")
+}
+
+enum TipoExperiencia {
+  VIAGEM
+  EVENTO
+  ROTA
+  MANUTENCAO
+  ENCONTRO
+  TREINO
+  COMPETICAO
+}
+
+enum StatusValidacao {
+  EM_APROVACAO
+  VALIDADA
+  VALIDADA_DESTAQUE
+  EM_REVISAO
+  REJEITADA
+}
+
+// =============================================================
+// EVIDENCIA
+// =============================================================
+
+model Evidencia {
+  id             Int           @id @default(autoincrement())
+  experiencia_id Int
+  tenant_id      Int
+  tipo           TipoEvidencia
+  url            String
+  nome_arquivo   String?
+  tamanho_bytes  Int?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  deleted_at     DateTime?
+
+  experiencia    Experiencia @relation(fields: [experiencia_id], references: [id])
+  tenant         Tenant      @relation(fields: [tenant_id], references: [id])
+
+  @@map("evidencias")
+}
+
+enum TipoEvidencia {
+  NOTA_FISCAL
+  FOTO
+  LINK
+  GPS
+  CONFIRMACAO
+}
+
+// =============================================================
+// VALIDACAO
+// =============================================================
+
+model Validacao {
+  id             Int           @id @default(autoincrement())
+  experiencia_id Int
+  tenant_id      Int
+  validador_id   Int
+  acao           AcaoValidacao
+  observacao     String?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  experiencia    Experiencia @relation(fields: [experiencia_id], references: [id])
+  tenant         Tenant      @relation(fields: [tenant_id], references: [id])
+  validador      Usuario     @relation(fields: [validador_id], references: [id])
+
+  @@map("validacoes")
+}
+
+enum AcaoValidacao {
+  APROVADA
+  APROVADA_DESTAQUE
+  EM_REVISAO
+  REJEITADA
+}
+
+// =============================================================
+// EVOLUCAO
+// =============================================================
+
+model Evolucao {
+  id             Int      @id @default(autoincrement())
+  usuario_id     Int
+  tenant_id      Int
+  nivel_anterior Int
+  nivel_atual    Int
+  motivo         String?
+  created_at     DateTime @default(now())
+
+  usuario        Usuario @relation(fields: [usuario_id], references: [id])
+  tenant         Tenant  @relation(fields: [tenant_id], references: [id])
+
+  @@map("evolucoes")
+}
+
+// =============================================================
+// CONTEUDO
+// =============================================================
+
+model Conteudo {
+  id                Int          @id @default(autoincrement())
+  tenant_id         Int
+  titulo            String
+  descricao         String?
+  corpo             String?
+  tipo              TipoConteudo
+  nivel_recomendado Int?
+  tempo_leitura_min Int?
+  thumbnail_url     String?
+  ativo             Boolean      @default(true)
+  created_at        DateTime     @default(now())
+  updated_at        DateTime     @updatedAt
+  deleted_at        DateTime?
+
+  tenant            Tenant @relation(fields: [tenant_id], references: [id])
+
+  @@map("conteudos")
+}
+
+enum TipoConteudo {
+  ARTIGO
+  VIDEO
+  CHECKLIST
+  GUIA
+}
+
+// =============================================================
+// CONFIGURACAO DE CAMPO
+// =============================================================
+
+model ConfiguracaoCampo {
+  id          Int      @id @default(autoincrement())
+  tenant_id   Int
+  tela        String
+  campo       String
+  visivel     Boolean  @default(true)
+  habilitado  Boolean  @default(true)
+  obrigatorio Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  tenant      Tenant @relation(fields: [tenant_id], references: [id])
+
+  @@unique([tenant_id, tela, campo])
+  @@map("configuracoes_campos")
+}
+
+// =============================================================
+// AUDITORIA LOG
+// =============================================================
+
+model AuditoriaLog {
+  id             Int      @id @default(autoincrement())
+  tenant_id      Int?
+  usuario_id     Int?
+  tipo_log       TipoLog
+  tabela         String?
+  registro_id    Int?
+  acao           String
+  valor_anterior Json?
+  valor_novo     Json?
+  ip             String?
+  user_agent     String?
+  erro           String?
+  created_at     DateTime @default(now())
+
+  tenant         Tenant?  @relation(fields: [tenant_id], references: [id])
+  usuario        Usuario? @relation(fields: [usuario_id], references: [id])
+
+  @@map("auditoria_logs")
+}
+
+enum TipoLog {
+  ACAO
+  ERRO
+  ACESSO
+  SISTEMA
+}
