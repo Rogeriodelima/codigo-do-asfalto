@@ -145,7 +145,7 @@ export async function listarConvites(usuario_id: number, tenant_id: number) {
   });
 
   const resultado = await Promise.all(
-    convites.map(async (c) => {
+    convites.map(async (c: any) => {
       let email = c.email_convidado;
       if (c.chave_cripto_id) {
         const chave = await getChavePorId(prisma as any, c.chave_cripto_id);

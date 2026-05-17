@@ -26,7 +26,7 @@ export async function listarEquipamentos(
 
   // Descriptografa identificador de cada equipamento
   const resultado = await Promise.all(
-    equipamentos.map(async (eq) => {
+    equipamentos.map(async (eq: any) => {
       let identificador = null;
       if (eq.identificador && eq.chave_cripto_id) {
         const chave = await getChavePorId(prisma as any, eq.chave_cripto_id);

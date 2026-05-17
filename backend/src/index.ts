@@ -7,6 +7,7 @@ import authRoutes from "./api/v1/auth/auth.routes";
 import perfilRoutes from "./api/v1/perfil/perfil.routes";
 import equipamentosRoutes from "./api/v1/equipamentos/equipamentos.routes";
 import convitesRoutes from "./api/v1/convites/convites.routes";
+import experienciasRoutes from "./api/v1/experiencias/experiencias.routes";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/perfil", perfilRoutes);
 app.use("/api/v1/equipamentos", equipamentosRoutes);
 app.use("/api/v1/convites", convitesRoutes);
+app.use("/api/v1/experiencias", experienciasRoutes);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {

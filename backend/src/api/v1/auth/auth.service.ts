@@ -120,21 +120,19 @@ export async function loginUsuario(dados: {
   tenant_id: number;
 }) {
   // Busca usuario
-  const usuario = await prisma.usuario.findUnique({
-    where: { email: dados.email },
-    include: {
-      tenants: {
-        where: { tenant_id: dados.tenant_id, status: "ATIVO" },
-      },
-    },
-  });
+  let usuario;
+  try {
+    usuario = await prisma.usuario.findUnique({
+      where: { email: dados.email },
+    });
+  } catch (err: any) {
+    console.error("ERRO DETALHADO:", err.message);
+    console.error("CAUSA:", err.cause);
+    throw err;
+  }
 
   if (!usuario || !usuario.senha_hash) {
     throw new Error("Email ou senha invalidos");
-  }
-
-  if (usuario.tenants.length === 0) {
-    throw new Error("Usuario nao tem acesso a este tenant");
   }
 
   if (!usuario.ativo) {
@@ -147,13 +145,27 @@ export async function loginUsuario(dados: {
     throw new Error("Email ou senha invalidos");
   }
 
+  // Verifica vinculo com tenant separadamente
+  const usuarioTenant = await prisma.usuarioTenant.findFirst({
+    where: {
+      usuario_id: usuario.id,
+      tenant_id: dados.tenant_id,
+      status: "ATIVO",
+      deleted_at: null,
+    },
+  });
+
+  if (!usuarioTenant) {
+    throw new Error("Usuario nao tem acesso a este tenant");
+  }
+
   // Gera token JWT
   const token = jwt.sign(
     {
       id: usuario.id,
       email: usuario.email,
       tenant_id: dados.tenant_id,
-      nivel: usuario.tenants[0].nivel_atual,
+      nivel: usuarioTenant.nivel_atual,
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,
@@ -175,7 +187,7 @@ export async function loginUsuario(dados: {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      nivel: usuario.tenants[0].nivel_atual,
+      nivel: usuarioTenant.nivel_atual,
       tenant_id: dados.tenant_id,
     },
   };
