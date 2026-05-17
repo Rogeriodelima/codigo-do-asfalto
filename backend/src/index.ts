@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { prisma } from "./utils/prisma";
 import authRoutes from "./api/v1/auth/auth.routes";
 import perfilRoutes from "./api/v1/perfil/perfil.routes";
+import equipamentosRoutes from "./api/v1/equipamentos/equipamentos.routes";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ if (process.env.NODE_ENV === "development") {
 // Rotas
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/perfil", perfilRoutes);
+app.use("/api/v1/equipamentos", equipamentosRoutes);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {
