@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import { prisma } from "./utils/prisma";
+import authRoutes from "./api/v1/auth/auth.routes";
 
 dotenv.config();
 
@@ -27,6 +28,9 @@ if (process.env.NODE_ENV === "development") {
     next();
   });
 }
+
+// Rotas
+app.use("/api/v1/auth", authRoutes);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {
