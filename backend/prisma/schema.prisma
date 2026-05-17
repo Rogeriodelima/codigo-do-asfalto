@@ -50,6 +50,7 @@ model Tenant {
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime?
+  convite_expiracao_dias Int @default(7)
 
   usuarios      UsuarioTenant[]
   equipamentos  Equipamento[]

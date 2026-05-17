@@ -6,6 +6,7 @@ import { prisma } from "./utils/prisma";
 import authRoutes from "./api/v1/auth/auth.routes";
 import perfilRoutes from "./api/v1/perfil/perfil.routes";
 import equipamentosRoutes from "./api/v1/equipamentos/equipamentos.routes";
+import convitesRoutes from "./api/v1/convites/convites.routes";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/perfil", perfilRoutes);
 app.use("/api/v1/equipamentos", equipamentosRoutes);
+app.use("/api/v1/convites", convitesRoutes);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../../utils/prisma";
 import { getChaveAtiva, encrypt } from "../../../utils/crypto";
+import { enviarEmailBoasVindas } from "../../../utils/email";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
@@ -92,6 +93,18 @@ export async function registrarUsuario(dados: {
       acao: "REGISTRO",
       valor_novo: { email: dados.email, nome: dados.nome },
     },
+  });
+
+  // Envia email de boas vindas
+  const tenantInfo = await prisma.tenant.findUnique({
+    where: { id: dados.tenant_id },
+    select: { nome: true },
+  });
+
+  await enviarEmailBoasVindas({
+    email_destinatario: dados.email,
+    nome_usuario: dados.nome,
+    tenant_nome: tenantInfo?.nome || "Codigo do Asfalto",
   });
 
   return { id: usuario.id, nome: usuario.nome, email: usuario.email };
