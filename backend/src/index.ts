@@ -4,6 +4,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import { prisma } from "./utils/prisma";
 import authRoutes from "./api/v1/auth/auth.routes";
+import perfilRoutes from "./api/v1/perfil/perfil.routes";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Rotas
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/perfil", perfilRoutes);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {
