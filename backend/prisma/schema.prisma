@@ -1,7 +1,7 @@
 // =============================================================
 // Codigo do Asfalto - Schema Prisma Definitivo
 // Multi-tenant | Soft Delete | Auditoria | OAuth
-// Versao 2 - Equipamentos genericos (nao limitado a motos)
+// Versao 3 - Criptografia com rotacao semanal de chaves
 // =============================================================
 
 generator client {
@@ -13,33 +13,54 @@ datasource db {
 }
 
 // =============================================================
+// CHAVE CRIPTOGRAFIA (rotacao semanal)
+// =============================================================
+
+model ChaveCriptografia {
+  id              Int       @id @default(autoincrement())
+  chave_enc       String
+  vigencia_inicio DateTime
+  vigencia_fim    DateTime
+  ativo           Boolean   @default(true)
+  created_at      DateTime  @default(now())
+
+  usuarios        Usuario[]
+  equipamentos    Equipamento[]
+  convites        Convite[]
+  experiencias    Experiencia[]
+  logs            AuditoriaLog[]
+
+  @@map("chaves_criptografia")
+}
+
+// =============================================================
 // TENANT
 // =============================================================
 
 model Tenant {
-  id                    Int       @id @default(autoincrement())
-  nome                  String
-  slug                  String    @unique
-  cor_primaria          String
-  cor_secundaria        String
-  logo_url              String?
-  dominio               String?
-  tipo_produto_padrao   TipoProduto @default(MOTO)
-  ativo                 Boolean   @default(true)
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-  deleted_at            DateTime?
+  id                  Int         @id @default(autoincrement())
+  nome                String
+  slug                String      @unique
+  cor_primaria        String
+  cor_secundaria      String
+  logo_url            String?
+  dominio             String?
+  tipo_produto_padrao TipoProduto @default(MOTO)
+  ativo               Boolean     @default(true)
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime?
 
-  usuarios              UsuarioTenant[]
-  equipamentos          Equipamento[]
-  convites              Convite[]
-  experiencias          Experiencia[]
-  evidencias            Evidencia[]
-  validacoes            Validacao[]
-  evolucoes             Evolucao[]
-  conteudos             Conteudo[]
-  configuracoes         ConfiguracaoCampo[]
-  logs                  AuditoriaLog[]
+  usuarios      UsuarioTenant[]
+  equipamentos  Equipamento[]
+  convites      Convite[]
+  experiencias  Experiencia[]
+  evidencias    Evidencia[]
+  validacoes    Validacao[]
+  evolucoes     Evolucao[]
+  conteudos     Conteudo[]
+  configuracoes ConfiguracaoCampo[]
+  logs          AuditoriaLog[]
 
   @@map("tenants")
 }
@@ -49,30 +70,32 @@ model Tenant {
 // =============================================================
 
 model Usuario {
-  id               Int       @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   nome             String
   nome_exibido     String?
-  email            String    @unique
+  email            String             @unique
   celular          String?
   cpf              String?
   senha_hash       String?
   oauth_provider   String?
   oauth_id         String?
   foto_url         String?
-  email_verificado Boolean   @default(false)
-  ativo            Boolean   @default(true)
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
+  email_verificado Boolean            @default(false)
+  ativo            Boolean            @default(true)
+  chave_cripto_id  Int?
+  created_at       DateTime           @default(now())
+  updated_at       DateTime           @updatedAt
   deleted_at       DateTime?
 
-  tenants              UsuarioTenant[]
-  equipamentos         Equipamento[]
-  convites_gerados     Convite[]     @relation("ConviteGeradoPor")
-  convites_usados      Convite[]     @relation("ConviteUsadoPor")
-  experiencias         Experiencia[]
-  evolucoes            Evolucao[]
-  validacoes           Validacao[]
-  logs                 AuditoriaLog[]
+  chave_cripto     ChaveCriptografia? @relation(fields: [chave_cripto_id], references: [id])
+  tenants          UsuarioTenant[]
+  equipamentos     Equipamento[]
+  convites_gerados Convite[]          @relation("ConviteGeradoPor")
+  convites_usados  Convite[]          @relation("ConviteUsadoPor")
+  experiencias     Experiencia[]
+  evolucoes        Evolucao[]
+  validacoes       Validacao[]
+  logs             AuditoriaLog[]
 
   @@map("usuarios")
 }
@@ -82,18 +105,18 @@ model Usuario {
 // =============================================================
 
 model UsuarioTenant {
-  id             Int                  @id @default(autoincrement())
-  usuario_id     Int
-  tenant_id      Int
-  nivel_atual    Int                  @default(1)
-  tenant_padrao  Boolean              @default(false)
-  status         StatusUsuarioTenant  @default(ATIVO)
-  created_at     DateTime             @default(now())
-  updated_at     DateTime             @updatedAt
-  deleted_at     DateTime?
+  id            Int                @id @default(autoincrement())
+  usuario_id    Int
+  tenant_id     Int
+  nivel_atual   Int                @default(1)
+  tenant_padrao Boolean            @default(false)
+  status        StatusUsuarioTenant @default(ATIVO)
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @updatedAt
+  deleted_at    DateTime?
 
-  usuario        Usuario  @relation(fields: [usuario_id], references: [id])
-  tenant         Tenant   @relation(fields: [tenant_id], references: [id])
+  usuario       Usuario @relation(fields: [usuario_id], references: [id])
+  tenant        Tenant  @relation(fields: [tenant_id], references: [id])
 
   @@unique([usuario_id, tenant_id])
   @@map("usuario_tenants")
@@ -110,23 +133,25 @@ enum StatusUsuarioTenant {
 // =============================================================
 
 model Equipamento {
-  id            Int         @id @default(autoincrement())
-  usuario_id    Int
-  tenant_id     Int
-  tipo_produto  TipoProduto @default(MOTO)
-  modelo        String
-  categoria     String?
-  ano           Int?
-  cor           String?
-  identificador String?
-  foto_url      String?
-  ativo         Boolean     @default(true)
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @updatedAt
-  deleted_at    DateTime?
+  id              Int                @id @default(autoincrement())
+  usuario_id      Int
+  tenant_id       Int
+  tipo_produto    TipoProduto        @default(MOTO)
+  modelo          String
+  categoria       String?
+  ano             Int?
+  cor             String?
+  identificador   String?
+  foto_url        String?
+  ativo           Boolean            @default(true)
+  chave_cripto_id Int?
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+  deleted_at      DateTime?
 
-  usuario       Usuario  @relation(fields: [usuario_id], references: [id])
-  tenant        Tenant   @relation(fields: [tenant_id], references: [id])
+  chave_cripto    ChaveCriptografia? @relation(fields: [chave_cripto_id], references: [id])
+  usuario         Usuario            @relation(fields: [usuario_id], references: [id])
+  tenant          Tenant             @relation(fields: [tenant_id], references: [id])
 
   @@map("equipamentos")
 }
@@ -146,23 +171,25 @@ enum TipoProduto {
 // =============================================================
 
 model Convite {
-  id                 Int           @id @default(autoincrement())
-  tenant_id          Int
-  gerado_por         Int
-  email_convidado    String
-  celular_convidado  String?
-  codigo             String        @unique
-  status             StatusConvite @default(PENDENTE)
-  data_expiracao     DateTime
-  data_uso           DateTime?
-  usado_por          Int?
-  created_at         DateTime      @default(now())
-  updated_at         DateTime      @updatedAt
-  deleted_at         DateTime?
+  id                Int                @id @default(autoincrement())
+  tenant_id         Int
+  gerado_por        Int
+  email_convidado   String
+  celular_convidado String?
+  codigo            String             @unique
+  status            StatusConvite      @default(PENDENTE)
+  data_expiracao    DateTime
+  data_uso          DateTime?
+  usado_por         Int?
+  chave_cripto_id   Int?
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  deleted_at        DateTime?
 
-  tenant             Tenant   @relation(fields: [tenant_id], references: [id])
-  gerador            Usuario  @relation("ConviteGeradoPor", fields: [gerado_por], references: [id])
-  usuario_uso        Usuario? @relation("ConviteUsadoPor", fields: [usado_por], references: [id])
+  chave_cripto      ChaveCriptografia? @relation(fields: [chave_cripto_id], references: [id])
+  tenant            Tenant             @relation(fields: [tenant_id], references: [id])
+  gerador           Usuario            @relation("ConviteGeradoPor", fields: [gerado_por], references: [id])
+  usuario_uso       Usuario?           @relation("ConviteUsadoPor", fields: [usado_por], references: [id])
 
   @@map("convites")
 }
@@ -179,26 +206,28 @@ enum StatusConvite {
 // =============================================================
 
 model Experiencia {
-  id                    Int               @id @default(autoincrement())
-  usuario_id            Int
-  tenant_id             Int
-  tipo                  TipoExperiencia
-  titulo                String
-  descricao             String?
-  data                  DateTime
-  localizacao           String?
-  distancia_ou_duracao  String?
-  participantes         Int?
-  status_validacao      StatusValidacao   @default(EM_APROVACAO)
-  pontuacao             Int?
-  created_at            DateTime          @default(now())
-  updated_at            DateTime          @updatedAt
-  deleted_at            DateTime?
+  id                   Int                @id @default(autoincrement())
+  usuario_id           Int
+  tenant_id            Int
+  tipo                 TipoExperiencia
+  titulo               String
+  descricao            String?
+  data                 DateTime
+  localizacao          String?
+  distancia_ou_duracao String?
+  participantes        Int?
+  status_validacao     StatusValidacao    @default(EM_APROVACAO)
+  pontuacao            Int?
+  chave_cripto_id      Int?
+  created_at           DateTime           @default(now())
+  updated_at           DateTime           @updatedAt
+  deleted_at           DateTime?
 
-  usuario               Usuario     @relation(fields: [usuario_id], references: [id])
-  tenant                Tenant      @relation(fields: [tenant_id], references: [id])
-  evidencias            Evidencia[]
-  validacoes            Validacao[]
+  chave_cripto         ChaveCriptografia? @relation(fields: [chave_cripto_id], references: [id])
+  usuario              Usuario            @relation(fields: [usuario_id], references: [id])
+  tenant               Tenant             @relation(fields: [tenant_id], references: [id])
+  evidencias           Evidencia[]
+  validacoes           Validacao[]
 
   @@map("experiencias")
 }
@@ -355,22 +384,24 @@ model ConfiguracaoCampo {
 // =============================================================
 
 model AuditoriaLog {
-  id             Int      @id @default(autoincrement())
-  tenant_id      Int?
-  usuario_id     Int?
-  tipo_log       TipoLog
-  tabela         String?
-  registro_id    Int?
-  acao           String
-  valor_anterior Json?
-  valor_novo     Json?
-  ip             String?
-  user_agent     String?
-  erro           String?
-  created_at     DateTime @default(now())
+  id              Int                @id @default(autoincrement())
+  tenant_id       Int?
+  usuario_id      Int?
+  tipo_log        TipoLog
+  tabela          String?
+  registro_id     Int?
+  acao            String
+  valor_anterior  Json?
+  valor_novo      Json?
+  ip              String?
+  user_agent      String?
+  erro            String?
+  chave_cripto_id Int?
+  created_at      DateTime           @default(now())
 
-  tenant         Tenant?  @relation(fields: [tenant_id], references: [id])
-  usuario        Usuario? @relation(fields: [usuario_id], references: [id])
+  chave_cripto    ChaveCriptografia? @relation(fields: [chave_cripto_id], references: [id])
+  tenant          Tenant?            @relation(fields: [tenant_id], references: [id])
+  usuario         Usuario?           @relation(fields: [usuario_id], references: [id])
 
   @@map("auditoria_logs")
 }
