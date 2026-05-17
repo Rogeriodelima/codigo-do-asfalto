@@ -51,6 +51,9 @@ model Tenant {
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime?
   convite_expiracao_dias Int @default(7)
+  validacao_sla_horas           Int @default(36)
+  validacao_escalonamento_horas Int @default(12)
+  validacao_lembrete_horas      Int @default(2)
 
   usuarios      UsuarioTenant[]
   equipamentos  Equipamento[]
@@ -62,6 +65,7 @@ model Tenant {
   conteudos     Conteudo[]
   configuracoes ConfiguracaoCampo[]
   logs          AuditoriaLog[]
+  validadores    ValidadorTenant[]
 
   @@map("tenants")
 }
@@ -97,6 +101,7 @@ model Usuario {
   evolucoes        Evolucao[]
   validacoes       Validacao[]
   logs             AuditoriaLog[]
+  validador_tenants ValidadorTenant[]
 
   @@map("usuarios")
 }
@@ -127,6 +132,26 @@ enum StatusUsuarioTenant {
   ATIVO
   SUSPENSO
   CANCELADO
+}
+
+// =============================================================
+// VALIDADOR TENANT (ordem de escalonamento)
+// =============================================================
+
+model ValidadorTenant {
+  id         Int      @id @default(autoincrement())
+  tenant_id  Int
+  usuario_id Int
+  ordem      Int      @default(1)
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  tenant     Tenant   @relation(fields: [tenant_id], references: [id])
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id])
+
+  @@unique([tenant_id, usuario_id])
+  @@map("validador_tenants")
 }
 
 // =============================================================
