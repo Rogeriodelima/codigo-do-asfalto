@@ -11,7 +11,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "ts-node prisma/seed.ts",
-    "rotacao:chaves": "ts-node src/jobs/rotacao-chaves.ts"
+    "rotacao:chaves": "ts-node src/jobs/rotacao-chaves.ts",
+    "escalonamento": "ts-node src/jobs/escalonamento-validacoes.ts"
   },
   "keywords": [],
   "author": "Rogerio de Lima",
