@@ -9,6 +9,7 @@ import equipamentosRoutes from "./api/v1/equipamentos/equipamentos.routes";
 import convitesRoutes from "./api/v1/convites/convites.routes";
 import experienciasRoutes from "./api/v1/experiencias/experiencias.routes";
 import validacoesRoutes from "./api/v1/validacoes/validacoes.routes";
+import evolucaoRoutes from "./api/v1/evolucao/evolucao.routes";
 
 dotenv.config();
 
@@ -41,6 +42,10 @@ app.use("/api/v1/equipamentos", equipamentosRoutes);
 app.use("/api/v1/convites", convitesRoutes);
 app.use("/api/v1/experiencias", experienciasRoutes);
 app.use("/api/v1/validacoes", validacoesRoutes);
+app.use("/api/v1/evolucao", evolucaoRoutes);
+console.log(
+  "Rotas registradas: auth, perfil, equipamentos, convites, experiencias, validacoes, evolucao",
+);
 
 // Health check
 app.get("/health", async (req: Request, res: Response) => {
