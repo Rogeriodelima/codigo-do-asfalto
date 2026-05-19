@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anton, Montserrat } from "next/font/google";
+import { TemaProvider } from "@/contexts/TemaContext";
 import "./globals.css";
 
 const anton = Anton({
@@ -25,7 +26,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={`${anton.variable} ${montserrat.variable}`}>
-      <body>{children}</body>
+      <body>
+        <TemaProvider>{children}</TemaProvider>
+      </body>
     </html>
   );
 }

@@ -2,42 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTema } from "@/contexts/TemaContext";
+import ToggleTema from "@/components/ToggleTema";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { tema, t } = useTema();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
-  const [tema, setTema] = useState<"escuro" | "claro">("escuro");
-
-  const t = {
-    escuro: {
-      fundo: "#060F1C",
-      fundoCard: "#0D1F35",
-      fundoEsquerdo:
-        "linear-gradient(135deg, #0B1F3A 0%, #060F1C 50%, #0D2847 100%)",
-      borda: "#1A3A5C",
-      textoPrincipal: "#FFFFFF",
-      textoSecundario: "#8FA3B8",
-      inputBg: "#0D1F35",
-      erroFundo: "rgba(220, 38, 38, 0.1)",
-      erroBorda: "rgba(220, 38, 38, 0.3)",
-      erroTexto: "#FCA5A5",
-    },
-    claro: {
-      fundo: "#F0F4F8",
-      fundoCard: "#FFFFFF",
-      fundoEsquerdo: "linear-gradient(135deg, #0B1F3A 0%, #1A3A5C 100%)",
-      borda: "#D1D5DB",
-      textoPrincipal: "#0B1F3A",
-      textoSecundario: "#4A6278",
-      inputBg: "#F8FAFC",
-      erroFundo: "rgba(220, 38, 38, 0.05)",
-      erroBorda: "rgba(220, 38, 38, 0.2)",
-      erroTexto: "#DC2626",
-    },
-  }[tema];
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -72,7 +46,6 @@ export default function LoginPage() {
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap');
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .login-grid {
@@ -102,102 +75,84 @@ export default function LoginPage() {
           max-width: 380px;
         }
 
-        .btn-tema {
+        .btn-tema-fixo {
           position: fixed;
           top: 20px;
           right: 20px;
-          background: rgba(242, 183, 5, 0.15);
-          border: 1px solid #F2B705;
-          border-radius: 50px;
-          padding: 8px 16px;
-          color: #F2B705;
-          font-size: 12px;
-          letter-spacing: 1px;
-          cursor: pointer;
           z-index: 100;
-          font-family: Montserrat, sans-serif;
+        }
+
+        .pilares {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
         }
 
         @media (max-width: 768px) {
-          .login-grid {
-            grid-template-columns: 1fr;
-          }
-          .lado-esquerdo {
-            padding: 40px 24px;
-            min-height: auto;
-          }
-          .texto-grande {
-            font-size: 36px !important;
-          }
-          .pilares {
-            display: none !important;
-          }
-          .lado-direito {
-            padding: 40px 24px;
-          }
+          .login-grid { grid-template-columns: 1fr; }
+          .lado-esquerdo { padding: 40px 24px; min-height: auto; }
+          .texto-grande { font-size: 36px !important; }
+          .pilares { display: none !important; }
+          .lado-direito { padding: 40px 24px; }
         }
       `}</style>
 
-      <button
-        className="btn-tema"
-        onClick={() => setTema(tema === "escuro" ? "claro" : "escuro")}
-      >
-        {tema === "escuro" ? "☀️ Claro" : "🌙 Escuro"}
-      </button>
+      <div className="btn-tema-fixo">
+        <ToggleTema />
+      </div>
 
       <div
         className="login-grid"
-        style={{ background: t.fundo, fontFamily: "Montserrat, sans-serif" }}
+        style={{
+          background: t.fundo,
+          fontFamily: "Montserrat, sans-serif",
+        }}
       >
         {/* Lado esquerdo */}
         <div className="lado-esquerdo" style={{ background: t.fundoEsquerdo }}>
-          {/* Círculos decorativos */}
-          {[
-            "400px,-100px,-100px",
-            "300px,-50px,-50px",
-            "350px,auto,auto,-80px,-80px",
-          ].map((_, i) => (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                top: i === 0 ? "-100px" : i === 1 ? "-50px" : "auto",
-                bottom: i === 2 ? "-80px" : "auto",
-                left: i === 0 ? "-100px" : i === 1 ? "-50px" : "auto",
-                right: i === 2 ? "-80px" : "auto",
-                width: i === 0 ? "400px" : i === 1 ? "300px" : "350px",
-                height: i === 0 ? "400px" : i === 1 ? "300px" : "350px",
-                borderRadius: "50%",
-                border: `1px solid rgba(242, 183, 5, ${i === 0 ? 0.15 : i === 1 ? 0.1 : 0.08})`,
-                pointerEvents: "none",
-              }}
-            />
-          ))}
+          <div
+            style={{
+              width: "3px",
+              height: "300px",
+              background: "rgba(242,183,5,0.1)",
+              position: "absolute",
+              top: 0,
+              right: 0,
+            }}
+          />
 
           {/* Logo */}
-          <div style={{ lineHeight: "1.1" }}>
-            <div
-              style={{
-                fontFamily: "Anton, sans-serif",
-                fontSize: "28px",
-                color: "#FFFFFF",
-                letterSpacing: "4px",
-              }}
-            >
-              CÓDIGO DO
-            </div>
-            <div
-              style={{
-                fontFamily: "Anton, sans-serif",
-                fontSize: "28px",
-                color: "#F2B705",
-                letterSpacing: "4px",
-              }}
-            >
-              ASFALTO
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                style={{ width: "4px", height: "48px", background: "#F2B705" }}
+              />
+              <div style={{ lineHeight: "1.1" }}>
+                <div
+                  style={{
+                    fontFamily: "Anton, sans-serif",
+                    fontSize: "28px",
+                    color: "#FFFFFF",
+                    letterSpacing: "4px",
+                  }}
+                >
+                  CÓDIGO DO
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Anton, sans-serif",
+                    fontSize: "28px",
+                    color: "#F2B705",
+                    letterSpacing: "4px",
+                  }}
+                >
+                  ASFALTO
+                </div>
+              </div>
             </div>
           </div>
-          {/* Texto */}
+
+          {/* Texto central */}
           <div>
             <div
               style={{
@@ -241,14 +196,7 @@ export default function LoginPage() {
           </div>
 
           {/* Pilares */}
-          <div
-            className="pilares"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "12px",
-            }}
-          >
+          <div className="pilares">
             {["EVOLUÇÃO", "EXPERIÊNCIA", "COMUNIDADE", "PROPÓSITO"].map(
               (item) => (
                 <div
@@ -269,7 +217,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Lado direito - Formulário */}
+        {/* Lado direito */}
         <div className="lado-direito" style={{ background: t.fundo }}>
           <div className="form-container">
             <div style={{ marginBottom: "40px" }}>
@@ -296,8 +244,8 @@ export default function LoginPage() {
                   style={{
                     display: "block",
                     fontSize: "11px",
-                    color: tema === "escuro" ? "#F2B705" : "#0B1F3A",
-                    fontWeight: tema === "claro" ? "700" : "400",
+                    color: t.labelCor,
+                    fontWeight: t.labelPeso,
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     marginBottom: "8px",
@@ -333,8 +281,8 @@ export default function LoginPage() {
                   style={{
                     display: "block",
                     fontSize: "11px",
-                    color: tema === "escuro" ? "#F2B705" : "#0B1F3A",
-                    fontWeight: tema === "claro" ? "700" : "400",
+                    color: t.labelCor,
+                    fontWeight: t.labelPeso,
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     marginBottom: "8px",
@@ -448,12 +396,10 @@ export default function LoginPage() {
                     fontFamily: "Montserrat, sans-serif",
                   }}
                   onMouseEnter={(e) =>
-                    ((e.target as HTMLButtonElement).style.borderColor =
-                      "#F2B705")
+                    (e.currentTarget.style.borderColor = "#F2B705")
                   }
                   onMouseLeave={(e) =>
-                    ((e.target as HTMLButtonElement).style.borderColor =
-                      t.borda)
+                    (e.currentTarget.style.borderColor = t.borda)
                   }
                 >
                   Continuar com {provider}
