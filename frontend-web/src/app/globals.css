@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --azul: #0b1f3a;
+  --amarelo: #f2b705;
+  --cinza: #d1d5db;
+  --azul-medio: #1a3a5c;
+  --azul-claro: #2a5080;
+  --branco: #ffffff;
+  --erro: #dc2626;
+  --sucesso: #16a34a;
+  --fundo: #060f1c;
+  --fundo-card: #0d1f35;
+  --borda: #1a3a5c;
+  --texto-principal: #ffffff;
+  --texto-secundario: #8fa3b8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--fundo);
+  color: var(--texto-principal);
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Anton", sans-serif;
+  letter-spacing: 0.02em;
+}
