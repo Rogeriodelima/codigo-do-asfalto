@@ -17,7 +17,7 @@ export default function ToggleTema() {
         fontSize: "12px",
         letterSpacing: "1px",
         cursor: "pointer",
-        fontFamily: "Montserrat, sans-serif",
+        fontFamily: "Plus Jakarta Sans, sans-serif",
         display: "flex",
         alignItems: "center",
         gap: "6px",

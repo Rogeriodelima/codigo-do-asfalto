@@ -108,7 +108,7 @@ export default function DashboardPage() {
           alignItems: "center",
           justifyContent: "center",
           color: t.erroTexto,
-          fontFamily: "Montserrat, sans-serif",
+          fontFamily: "Plus Jakarta Sans, sans-serif",
         }}
       >
         {erro || "Erro ao carregar dados"}
@@ -118,9 +118,9 @@ export default function DashboardPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap');
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        .dashboard { min-height: 100vh; font-family: Montserrat, sans-serif; }
+        .dashboard { min-height: 100vh; font-family: Plus Jakarta Sans, sans-serif; }
         .topbar {
           border-bottom: 1px solid ${t.borda};
           padding: 16px 32px;
@@ -157,7 +157,7 @@ export default function DashboardPage() {
           font-size: 12px;
           cursor: pointer;
           letter-spacing: 1px;
-          font-family: Montserrat, sans-serif;
+          font-family: Plus Jakarta Sans, sans-serif;
           font-weight: 700;
         }
         .exp-item {
@@ -206,7 +206,7 @@ export default function DashboardPage() {
               </div>
               <div
                 style={{
-                  fontSize: "10px",
+                  fontSize: "12px",
                   color: t.textoSecundario,
                   letterSpacing: "2px",
                   fontWeight: "600",
@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
-                  fontSize: "14px",
+                  fontSize: "16px",
                   fontWeight: "700",
                   color: t.textoPrincipal,
                 }}
@@ -231,7 +231,7 @@ export default function DashboardPage() {
               </div>
               <div
                 style={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   color: t.destaque,
                   letterSpacing: "1px",
                   fontWeight: "600",
@@ -248,10 +248,10 @@ export default function DashboardPage() {
                 borderRadius: "8px",
                 padding: "8px 16px",
                 color: t.textoSecundario,
-                fontSize: "12px",
+                fontSize: "13px",
                 letterSpacing: "1px",
                 cursor: "pointer",
-                fontFamily: "Montserrat, sans-serif",
+                fontFamily: "Plus Jakarta Sans, sans-serif",
                 fontWeight: "600",
               }}
             >
@@ -277,7 +277,7 @@ export default function DashboardPage() {
             <p
               style={{
                 color: t.textoSecundario,
-                fontSize: "14px",
+                fontSize: "16px",
                 fontWeight: "500",
               }}
             >
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                 </div>
                 <div
                   style={{
-                    fontSize: "10px",
+                    fontSize: "12px",
                     color: t.textoSecundario,
                     letterSpacing: "2px",
                     marginTop: "4px",
@@ -345,7 +345,7 @@ export default function DashboardPage() {
             <div className="card" style={{ background: t.fundoCard }}>
               <div
                 style={{
-                  fontSize: "11px",
+                  fontSize: "13px",
                   color: t.textoSecundario,
                   letterSpacing: "2px",
                   marginBottom: "20px",
@@ -386,7 +386,7 @@ export default function DashboardPage() {
                   </div>
                   <div
                     style={{
-                      fontSize: "12px",
+                      fontSize: "13px",
                       color: t.textoSecundario,
                       fontWeight: "500",
                     }}
@@ -407,7 +407,7 @@ export default function DashboardPage() {
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  fontSize: "12px",
+                  fontSize: "13px",
                   color: t.textoSecundario,
                   fontWeight: "500",
                 }}
@@ -431,7 +431,7 @@ export default function DashboardPage() {
               >
                 <div
                   style={{
-                    fontSize: "11px",
+                    fontSize: "13px",
                     color: t.destaque,
                     letterSpacing: "1px",
                     marginBottom: "8px",
@@ -442,7 +442,7 @@ export default function DashboardPage() {
                 </div>
                 <div
                   style={{
-                    fontSize: "14px",
+                    fontSize: "16px",
                     color: t.textoPrincipal,
                     fontWeight: "500",
                   }}
@@ -465,7 +465,7 @@ export default function DashboardPage() {
               >
                 <div
                   style={{
-                    fontSize: "11px",
+                    fontSize: "13px",
                     color: t.textoSecundario,
                     letterSpacing: "2px",
                     fontWeight: "700",
@@ -487,7 +487,7 @@ export default function DashboardPage() {
                     textAlign: "center",
                     padding: "40px 0",
                     color: t.textoSecundario,
-                    fontSize: "14px",
+                    fontSize: "16px",
                   }}
                 >
                   Nenhuma experiência registrada ainda.
@@ -503,7 +503,7 @@ export default function DashboardPage() {
                       <div>
                         <div
                           style={{
-                            fontSize: "14px",
+                            fontSize: "16px",
                             fontWeight: "600",
                             marginBottom: "4px",
                             color: t.textoPrincipal,
@@ -513,7 +513,7 @@ export default function DashboardPage() {
                         </div>
                         <div
                           style={{
-                            fontSize: "12px",
+                            fontSize: "13px",
                             color: t.textoSecundario,
                             fontWeight: "500",
                           }}

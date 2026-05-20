@@ -46,7 +46,7 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap');
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .login-grid {
@@ -106,7 +106,7 @@ export default function LoginPage() {
         className="login-grid"
         style={{
           background: t.fundo,
-          fontFamily: "Montserrat, sans-serif",
+          fontFamily: "Plus Jakarta Sans, sans-serif",
         }}
       >
         {/* Lado esquerdo */}
@@ -268,7 +268,7 @@ export default function LoginPage() {
                     color: t.textoPrincipal,
                     fontSize: "15px",
                     outline: "none",
-                    fontFamily: "Montserrat, sans-serif",
+                    fontFamily: "Plus Jakarta Sans, sans-serif",
                   }}
                   placeholder="seu@email.com"
                   onFocus={(e) => (e.target.style.borderColor = "#F2B705")}
@@ -305,7 +305,7 @@ export default function LoginPage() {
                     color: t.textoPrincipal,
                     fontSize: "15px",
                     outline: "none",
-                    fontFamily: "Montserrat, sans-serif",
+                    fontFamily: "Plus Jakarta Sans, sans-serif",
                   }}
                   placeholder="••••••••"
                   onFocus={(e) => (e.target.style.borderColor = "#F2B705")}
@@ -358,7 +358,7 @@ export default function LoginPage() {
                   textTransform: "uppercase",
                   cursor: loading ? "not-allowed" : "pointer",
                   marginBottom: "16px",
-                  fontFamily: "Montserrat, sans-serif",
+                  fontFamily: "Plus Jakarta Sans, sans-serif",
                 }}
               >
                 {loading ? "ENTRANDO..." : "ENTRAR"}
@@ -394,7 +394,7 @@ export default function LoginPage() {
                     letterSpacing: "1px",
                     cursor: "pointer",
                     marginBottom: "10px",
-                    fontFamily: "Montserrat, sans-serif",
+                    fontFamily: "Plus Jakarta Sans, sans-serif",
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.borderColor = "#F2B705")

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anton, Montserrat } from "next/font/google";
+import { Anton, Plus_Jakarta_Sans } from "next/font/google";
 import { TemaProvider } from "@/contexts/TemaContext";
 import "./globals.css";
 
@@ -9,9 +9,9 @@ const anton = Anton({
   variable: "--font-anton",
 });
 
-const montserrat = Montserrat({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-montserrat",
+  variable: "--font-jakarta",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${anton.variable} ${montserrat.variable}`}>
+    <html lang="pt-BR" className={`${anton.variable} ${jakarta.variable}`}>
       <body>
         <TemaProvider>{children}</TemaProvider>
       </body>
