@@ -1,4 +1,5 @@
 "use client";
+import { apiFetch } from "@/lib/api";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -55,7 +56,7 @@ export default function DashboardPage() {
       return;
     }
 
-    fetch("http://localhost:3001/api/v1/evolucao/dashboard", {
+    apiFetch("/api/v1/evolucao/dashboard", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
