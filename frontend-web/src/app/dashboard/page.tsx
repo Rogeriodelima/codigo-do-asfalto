@@ -90,7 +90,7 @@ export default function DashboardPage() {
           justifyContent: "center",
           color: t.destaque,
           fontFamily: "Anton, sans-serif",
-          fontSize: "20px",
+          fontSize: "1.25rem",
           letterSpacing: "3px",
         }}
       >
@@ -197,7 +197,7 @@ export default function DashboardPage() {
               <div
                 style={{
                   fontFamily: "Anton, sans-serif",
-                  fontSize: "16px",
+                  fontSize: "1rem",
                   letterSpacing: "3px",
                   color: t.textoPrincipal,
                 }}
@@ -206,7 +206,7 @@ export default function DashboardPage() {
               </div>
               <div
                 style={{
-                  fontSize: "12px",
+                  fontSize: "0.75rem",
                   color: t.textoSecundario,
                   letterSpacing: "2px",
                   fontWeight: "600",
@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
-                  fontSize: "16px",
+                  fontSize: "1rem",
                   fontWeight: "700",
                   color: t.textoPrincipal,
                 }}
@@ -231,7 +231,7 @@ export default function DashboardPage() {
               </div>
               <div
                 style={{
-                  fontSize: "13px",
+                  fontSize: "0.8125rem",
                   color: t.destaque,
                   letterSpacing: "1px",
                   fontWeight: "600",
@@ -248,7 +248,7 @@ export default function DashboardPage() {
                 borderRadius: "8px",
                 padding: "8px 16px",
                 color: t.textoSecundario,
-                fontSize: "13px",
+                fontSize: "0.8125rem",
                 letterSpacing: "1px",
                 cursor: "pointer",
                 fontFamily: "Plus Jakarta Sans, sans-serif",
@@ -266,7 +266,7 @@ export default function DashboardPage() {
             <h1
               style={{
                 fontFamily: "Anton, sans-serif",
-                fontSize: "28px",
+                fontSize: "1.75rem",
                 letterSpacing: "2px",
                 marginBottom: "4px",
                 color: t.textoPrincipal,
@@ -277,7 +277,7 @@ export default function DashboardPage() {
             <p
               style={{
                 color: t.textoSecundario,
-                fontSize: "16px",
+                fontSize: "1rem",
                 fontWeight: "500",
               }}
             >
@@ -316,7 +316,7 @@ export default function DashboardPage() {
               >
                 <div
                   style={{
-                    fontSize: "36px",
+                    fontSize: "2.25rem",
                     fontFamily: "Anton, sans-serif",
                     color: stat.cor,
                     letterSpacing: "2px",
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                 </div>
                 <div
                   style={{
-                    fontSize: "12px",
+                    fontSize: "0.75rem",
                     color: t.textoSecundario,
                     letterSpacing: "2px",
                     marginTop: "4px",
@@ -345,7 +345,7 @@ export default function DashboardPage() {
             <div className="card" style={{ background: t.fundoCard }}>
               <div
                 style={{
-                  fontSize: "13px",
+                  fontSize: "0.8125rem",
                   color: t.textoSecundario,
                   letterSpacing: "2px",
                   marginBottom: "20px",
@@ -366,7 +366,7 @@ export default function DashboardPage() {
                 <div
                   style={{
                     fontFamily: "Anton, sans-serif",
-                    fontSize: "64px",
+                    fontSize: "4rem",
                     color: NIVEL_CORES[data.nivel.atual] || "#D97706",
                     lineHeight: "1",
                   }}
@@ -377,7 +377,7 @@ export default function DashboardPage() {
                   <div
                     style={{
                       fontFamily: "Anton, sans-serif",
-                      fontSize: "22px",
+                      fontSize: "1.375rem",
                       color: t.textoPrincipal,
                       letterSpacing: "2px",
                     }}
@@ -386,7 +386,7 @@ export default function DashboardPage() {
                   </div>
                   <div
                     style={{
-                      fontSize: "13px",
+                      fontSize: "0.8125rem",
                       color: t.textoSecundario,
                       fontWeight: "500",
                     }}
@@ -407,7 +407,7 @@ export default function DashboardPage() {
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  fontSize: "13px",
+                  fontSize: "0.8125rem",
                   color: t.textoSecundario,
                   fontWeight: "500",
                 }}
@@ -431,7 +431,7 @@ export default function DashboardPage() {
               >
                 <div
                   style={{
-                    fontSize: "13px",
+                    fontSize: "0.8125rem",
                     color: t.destaque,
                     letterSpacing: "1px",
                     marginBottom: "8px",
@@ -442,7 +442,7 @@ export default function DashboardPage() {
                 </div>
                 <div
                   style={{
-                    fontSize: "16px",
+                    fontSize: "1rem",
                     color: t.textoPrincipal,
                     fontWeight: "500",
                   }}
@@ -465,7 +465,7 @@ export default function DashboardPage() {
               >
                 <div
                   style={{
-                    fontSize: "13px",
+                    fontSize: "0.8125rem",
                     color: t.textoSecundario,
                     letterSpacing: "2px",
                     fontWeight: "700",
@@ -487,7 +487,7 @@ export default function DashboardPage() {
                     textAlign: "center",
                     padding: "40px 0",
                     color: t.textoSecundario,
-                    fontSize: "16px",
+                    fontSize: "1rem",
                   }}
                 >
                   Nenhuma experiência registrada ainda.
@@ -503,7 +503,7 @@ export default function DashboardPage() {
                       <div>
                         <div
                           style={{
-                            fontSize: "16px",
+                            fontSize: "1rem",
                             fontWeight: "600",
                             marginBottom: "4px",
                             color: t.textoPrincipal,
@@ -513,7 +513,7 @@ export default function DashboardPage() {
                         </div>
                         <div
                           style={{
-                            fontSize: "13px",
+                            fontSize: "0.8125rem",
                             color: t.textoSecundario,
                             fontWeight: "500",
                           }}
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                         {exp.pontuacao && (
                           <div
                             style={{
-                              fontSize: "13px",
+                              fontSize: "0.8125rem",
                               fontWeight: "700",
                               color: t.destaque,
                             }}
