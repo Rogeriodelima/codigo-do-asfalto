@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import ToggleTema from "@/components/ToggleTema";
+import PainelAcessibilidade from "@/components/PainelAcessibilidade";
 
 interface DashboardData {
   usuario: { nome: string; foto_url: string | null };
@@ -218,6 +219,7 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <PainelAcessibilidade />
             <ToggleTema />
             <div style={{ textAlign: "right" }}>
               <div

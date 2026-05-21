@@ -1,5 +1,4 @@
 "use client";
-
 import {
   createContext,
   useContext,
@@ -9,10 +8,15 @@ import {
 } from "react";
 
 type Tema = "claro" | "escuro";
+type TamanhoFonte = "normal" | "grande" | "maior";
 
 interface TemaContextType {
   tema: Tema;
   toggleTema: () => void;
+  tamanhoFonte: TamanhoFonte;
+  setTamanhoFonte: (t: TamanhoFonte) => void;
+  altoContraste: boolean;
+  toggleAltoContraste: () => void;
   t: typeof TEMAS.claro;
 }
 
@@ -35,7 +39,7 @@ export const TEMAS = {
     fundoStat: "#FFFFFF",
     fundoProximo: "#F0F4F8",
     bordaProximo: "#D1D5DB",
-    destaque: "#0B1F3A", // azul escuro no claro
+    destaque: "#0B1F3A",
   },
   escuro: {
     fundo: "#060F1C",
@@ -51,24 +55,47 @@ export const TEMAS = {
     erroTexto: "#FCA5A5",
     labelCor: "#F2B705",
     labelPeso: "400",
-    fundoEsquerdo:
-      "linear-gradient(135deg, #0B1F3A 0%, #060F1C 50%, #0D2847 100%)",
+    fundoEsquerdo: "linear-gradient(135deg, #0B1F3A 0%, #060F1C 50%, #0D2847 100%)",
     fundoStat: "#0D1F35",
     fundoProximo: "#060F1C",
     bordaProximo: "#1A3A5C",
-    destaque: "#F2B705", // amarelo no escuro
+    destaque: "#F2B705",
   },
+};
+
+const TAMANHOS: Record<TamanhoFonte, string> = {
+  normal: "clamp(14px, 1.2vw + 10px, 18px)",
+  grande: "clamp(16px, 1.4vw + 11px, 20px)",
+  maior: "clamp(18px, 1.6vw + 12px, 22px)",
 };
 
 const TemaContext = createContext<TemaContextType>({} as TemaContextType);
 
 export function TemaProvider({ children }: { children: ReactNode }) {
   const [tema, setTema] = useState<Tema>("claro");
+  const [tamanhoFonte, setTamanhoFonteState] = useState<TamanhoFonte>("normal");
+  const [altoContraste, setAltoContraste] = useState(false);
 
   useEffect(() => {
-    const salvo = localStorage.getItem("tema") as Tema;
-    if (salvo) setTema(salvo);
+    const salvoTema = localStorage.getItem("tema") as Tema;
+    const salvoFonte = localStorage.getItem("tamanhoFonte") as TamanhoFonte;
+    const salvoContraste = localStorage.getItem("altoContraste");
+    if (salvoTema) setTema(salvoTema);
+    if (salvoFonte) setTamanhoFonteState(salvoFonte);
+    if (salvoContraste) setAltoContraste(salvoContraste === "true");
   }, []);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = TAMANHOS[tamanhoFonte];
+  }, [tamanhoFonte]);
+
+  useEffect(() => {
+    if (altoContraste) {
+      document.documentElement.style.filter = "contrast(1.25)";
+    } else {
+      document.documentElement.style.filter = "";
+    }
+  }, [altoContraste]);
 
   function toggleTema() {
     const novo = tema === "claro" ? "escuro" : "claro";
@@ -76,8 +103,27 @@ export function TemaProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("tema", novo);
   }
 
+  function setTamanhoFonte(t: TamanhoFonte) {
+    setTamanhoFonteState(t);
+    localStorage.setItem("tamanhoFonte", t);
+  }
+
+  function toggleAltoContraste() {
+    const novo = !altoContraste;
+    setAltoContraste(novo);
+    localStorage.setItem("altoContraste", String(novo));
+  }
+
   return (
-    <TemaContext.Provider value={{ tema, toggleTema, t: TEMAS[tema] }}>
+    <TemaContext.Provider value={{
+      tema,
+      toggleTema,
+      tamanhoFonte,
+      setTamanhoFonte,
+      altoContraste,
+      toggleAltoContraste,
+      t: TEMAS[tema],
+    }}>
       {children}
     </TemaContext.Provider>
   );
