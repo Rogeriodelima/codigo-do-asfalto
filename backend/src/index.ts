@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 import { prisma } from "./utils/prisma";
 import authRoutes from "./api/v1/auth/auth.routes";
 import perfilRoutes from "./api/v1/perfil/perfil.routes";
@@ -15,7 +17,13 @@ import conteudosRoutes from "./api/v1/conteudos/conteudos.routes";
 dotenv.config();
 
 const app = express();
+
+// teste
+app.get('/teste', (req, res) => res.json({ ok: true }));
+
 const PORT = process.env.PORT || 3001;
+
+
 
 // Middlewares de seguranca
 app.use(helmet());
@@ -45,6 +53,19 @@ app.use("/api/v1/experiencias", experienciasRoutes);
 app.use("/api/v1/validacoes", validacoesRoutes);
 app.use("/api/v1/evolucao", evolucaoRoutes);
 app.use("/api/v1/conteudos", conteudosRoutes);
+
+// Documentacao Swagger
+app.use('/api/docs',
+  (req: Request, res: Response, next: NextFunction) => {
+    res.removeHeader('Strict-Transport-Security');
+    res.removeHeader('Content-Security-Policy');
+    res.removeHeader('Cross-Origin-Opener-Policy');
+    res.removeHeader('Origin-Agent-Cluster');
+    next();
+  },
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
 
 console.log(
   "Rotas registradas: auth, perfil, equipamentos, convites, experiencias, validacoes, evolucao",
