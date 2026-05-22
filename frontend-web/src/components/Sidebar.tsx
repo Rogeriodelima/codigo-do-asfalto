@@ -125,42 +125,43 @@ export default function Sidebar() {
       }}
     >
       {/* ── Cabeçalho ── */}
-      <div
-        style={{
-          padding: "12px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          borderBottom: `1px solid ${cor.borda}`,
-          minHeight: "64px",
-        }}
-      >
-        {/* Logo mark — substituir src quando a imagem estiver disponível */}
+      {aberta ? (
+        /* Expandida: logo + nome + botão fechar */
         <div
           style={{
-            width: "38px",
-            height: "38px",
-            flexShrink: 0,
-            background: "#0B1F3A",
-            borderRadius: "8px",
+            padding: "12px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            gap: "10px",
+            borderBottom: `1px solid ${cor.borda}`,
+            minHeight: "64px",
           }}
         >
-          <span
+          {/* Logo mark — substituir src quando a imagem estiver disponível */}
+          <div
             style={{
-              fontFamily: "Anton, sans-serif",
-              fontSize: "11px",
-              color: "#F2B705",
-              letterSpacing: "1px",
+              width: "38px",
+              height: "38px",
+              flexShrink: 0,
+              background: "#0B1F3A",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            CDA
-          </span>
-        </div>
+            <span
+              style={{
+                fontFamily: "Anton, sans-serif",
+                fontSize: "11px",
+                color: "#F2B705",
+                letterSpacing: "1px",
+              }}
+            >
+              CDA
+            </span>
+          </div>
 
-        {aberta && (
           <div style={{ flex: 1, overflow: "hidden" }}>
             <div
               style={{
@@ -174,38 +175,68 @@ export default function Sidebar() {
               CÓDIGO DO ASFALTO
             </div>
           </div>
-        )}
 
-        {/* Botão sanduíche */}
-        <button
-          onClick={() => setAberta(!aberta)}
-          title={aberta ? "Recolher menu" : "Expandir menu"}
+          <button
+            onClick={() => setAberta(false)}
+            title="Recolher menu"
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: cor.texto,
+              padding: "4px",
+              display: "flex",
+              alignItems: "center",
+              borderRadius: "6px",
+              flexShrink: 0,
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = cor.ativo)
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = cor.texto)
+            }
+          >
+            <PanelLeftClose size={20} strokeWidth={1.75} />
+          </button>
+        </div>
+      ) : (
+        /* Recolhida: apenas o botão de expandir centralizado */
+        <div
           style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: cor.texto,
-            padding: "4px",
+            borderBottom: `1px solid ${cor.borda}`,
+            minHeight: "64px",
             display: "flex",
             alignItems: "center",
-            borderRadius: "6px",
-            flexShrink: 0,
-            marginLeft: aberta ? "auto" : undefined,
-            transition: "color 0.15s",
+            justifyContent: "center",
           }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLButtonElement).style.color = cor.ativo)
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLButtonElement).style.color = cor.texto)
-          }
         >
-          {aberta
-            ? <PanelLeftClose size={20} strokeWidth={1.75} />
-            : <Menu size={20} strokeWidth={1.75} />
-          }
-        </button>
-      </div>
+          <button
+            onClick={() => setAberta(true)}
+            title="Expandir menu"
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: cor.texto,
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+              borderRadius: "6px",
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = cor.ativo)
+            }
+            onMouseLeave={(e) =>
+              ((e.currentTarget as HTMLButtonElement).style.color = cor.texto)
+            }
+          >
+            <Menu size={20} strokeWidth={1.75} />
+          </button>
+        </div>
+      )}
 
       {/* ── Navegação ── */}
       <nav style={{ flex: 1, padding: "8px 0", overflowY: "auto" }}>
