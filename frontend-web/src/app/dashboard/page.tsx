@@ -4,9 +4,7 @@ import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
-import ToggleTema from "@/components/ToggleTema";
-import PainelAcessibilidade from "@/components/PainelAcessibilidade";
-import LayoutAutenticado from "@/components/LayoutAutenticado";
+import AppLayout from "@/components/AppLayout";
 
 
 interface DashboardData {
@@ -76,12 +74,6 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [router]);
 
-  function sair() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    router.push("/login");
-  }
-
   if (loading)
     return (
       <div
@@ -119,19 +111,11 @@ export default function DashboardPage() {
     );
 
   return (
-    <LayoutAutenticado>
+    <AppLayout>
       <style>{`
-        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        .dashboard { min-height: 100vh; font-family: Plus Jakarta Sans, sans-serif; }
-        .topbar {
-          border-bottom: 1px solid ${t.borda};
-          padding: 16px 32px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .conteudo { padding: 32px; max-width: 1200px; margin: 0 auto; }
+        .dashboard { min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .conteudo { padding: 32px; max-width: 1100px; }
         .grid-stats {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
@@ -178,9 +162,8 @@ export default function DashboardPage() {
           letter-spacing: 1px;
           font-weight: 600;
         }
-        @media (max-width: 768px) {
-          .topbar { padding: 16px; }
-          .conteudo { padding: 16px; }
+        @media (max-width: 900px) {
+          .conteudo { padding: 20px 16px; }
           .grid-stats { grid-template-columns: 1fr 1fr; }
           .grid-principal { grid-template-columns: 1fr; }
         }
@@ -190,81 +173,6 @@ export default function DashboardPage() {
         className="dashboard"
         style={{ background: t.fundo, color: t.textoPrincipal }}
       >
-        {/* Topbar */}
-        <div className="topbar" style={{ background: t.fundoTopbar }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              style={{ width: "3px", height: "32px", background: "#F2B705" }}
-            />
-            <div>
-              <div
-                style={{
-                  fontFamily: "Anton, sans-serif",
-                  fontSize: "1rem",
-                  letterSpacing: "3px",
-                  color: t.textoPrincipal,
-                }}
-              >
-                CÓDIGO DO ASFALTO
-              </div>
-              <div
-                style={{
-                  fontSize: "0.75rem",
-                  color: t.textoSecundario,
-                  letterSpacing: "2px",
-                  fontWeight: "600",
-                }}
-              >
-                PAINEL DO PILOTO
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <PainelAcessibilidade />
-            <ToggleTema />
-            <div style={{ textAlign: "right" }}>
-              <div
-                style={{
-                  fontSize: "1rem",
-                  fontWeight: "700",
-                  color: t.textoPrincipal,
-                }}
-              >
-                {data.usuario.nome}
-              </div>
-              <div
-                style={{
-                  fontSize: "0.8125rem",
-                  color: t.destaque,
-                  letterSpacing: "1px",
-                  fontWeight: "600",
-                }}
-              >
-                Nível {data.nivel.atual} — {data.nivel.nome}
-              </div>
-            </div>
-            <button
-              onClick={sair}
-              style={{
-                background: "transparent",
-                border: `1px solid ${t.borda}`,
-                borderRadius: "8px",
-                padding: "8px 16px",
-                color: t.textoSecundario,
-                fontSize: "0.8125rem",
-                letterSpacing: "1px",
-                cursor: "pointer",
-                fontFamily: "Plus Jakarta Sans, sans-serif",
-                fontWeight: "600",
-              }}
-            >
-              SAIR
-            </button>
-          </div>
-        </div>
-
-        {/* Conteúdo */}
         <div className="conteudo">
           <div style={{ marginBottom: "32px" }}>
             <h1
@@ -563,6 +471,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </LayoutAutenticado>
+    </AppLayout>
   );
 }
