@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import ToggleTema from "@/components/ToggleTema";
 import PainelAcessibilidade from "@/components/PainelAcessibilidade";
+import LayoutAutenticado from "@/components/LayoutAutenticado";
+
 
 interface DashboardData {
   usuario: { nome: string; foto_url: string | null };
@@ -117,7 +119,7 @@ export default function DashboardPage() {
     );
 
   return (
-    <>
+    <LayoutAutenticado>
       <style>{`
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -561,6 +563,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </>
+    </LayoutAutenticado>
   );
 }

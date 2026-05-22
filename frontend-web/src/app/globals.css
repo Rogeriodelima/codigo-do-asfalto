@@ -38,3 +38,25 @@ h6 {
   font-family: "Anton", sans-serif;
   letter-spacing: 0.02em;
 }
+
+/* Nav Bottom — visível só no mobile */
+.nav-sidebar-desktop {
+  display: none;
+}
+.nav-bottom-mobile {
+  display: flex;
+}
+
+/* Desktop — sidebar visível, nav bottom escondido */
+@media (min-width: 768px) {
+  .nav-sidebar-desktop {
+    display: flex;
+  }
+  .nav-bottom-mobile {
+    display: none;
+  }
+  .main-autenticado {
+    padding-left: 200px !important;
+    padding-bottom: 0 !important;
+  }
+}
