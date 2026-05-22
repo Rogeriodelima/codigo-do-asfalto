@@ -4,8 +4,7 @@ import { tempoRelativo } from "@/lib/tempo";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
-import ToggleTema from "@/components/ToggleTema";
-import PainelAcessibilidade from "@/components/PainelAcessibilidade";
+import AppLayout from "@/components/AppLayout";
 
 interface Experiencia {
   id: number;
@@ -102,7 +101,7 @@ export default function ExperienciasPage() {
   );
 
   return (
-    <>
+    <AppLayout>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .pagina { min-height: 100vh; font-family: Plus Jakarta Sans, sans-serif; }
@@ -124,28 +123,7 @@ export default function ExperienciasPage() {
       `}</style>
 
       <div className="pagina" style={{ background: t.fundo, color: t.textoPrincipal }}>
-        {/* Topbar */}
-        <div className="topbar" style={{ background: t.fundoTopbar }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ width: "3px", height: "32px", background: "#F2B705" }} />
-            <div>
-              <div style={{ fontFamily: "Anton, sans-serif", fontSize: "1rem", letterSpacing: "3px", color: t.textoPrincipal }}>
-                CÓDIGO DO ASFALTO
-              </div>
-              <div style={{ fontSize: "0.75rem", color: t.textoSecundario, letterSpacing: "2px", fontWeight: "600" }}>
-                EXPERIÊNCIAS
-              </div>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <PainelAcessibilidade />
-            <ToggleTema />
-            <button onClick={() => router.push("/dashboard")} className="btn-secondary">
-              PAINEL
-            </button>
-          </div>
-        </div>
-
+        
         {/* Conteúdo */}
         <div className="conteudo">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
@@ -269,6 +247,6 @@ export default function ExperienciasPage() {
           </div>
         </div>
       )}
-    </>
+    </AppLayout>
   );
 }
