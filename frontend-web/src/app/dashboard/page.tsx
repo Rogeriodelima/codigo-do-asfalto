@@ -118,9 +118,14 @@ export default function DashboardPage() {
         .conteudo { padding: 32px; max-width: 1100px; }
         .grid-stats {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
           margin-bottom: 32px;
+        }
+        @media (min-width: 900px) {
+          .grid-stats {
+            grid-template-columns: repeat(4, 1fr);
+          }
         }
         .grid-principal { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .card { border: 1px solid ${t.borda}; border-radius: 16px; padding: 24px; }

@@ -1,21 +1,21 @@
 "use client";
-
-import { useTema } from "@/contexts/TemaContext";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "./Sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { t } = useTema();
-
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
-        background: t.fundo,
-      }}
-    >
+    <div style={{ display: "flex", minHeight: "100vh", width: "100%" }}>
       <Sidebar />
-      <main style={{ flex: 1, minWidth: 0, overflowX: "hidden" }}>
+      <main
+        className="main-conteudo"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          maxWidth: "100%",
+          overflowY: "auto",
+          overflowX: "hidden",
+          minHeight: "100vh",
+        }}
+      >
         {children}
       </main>
     </div>
