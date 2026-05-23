@@ -33,7 +33,23 @@ body {
   line-height: 1.2 !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Anton", sans-serif;
   letter-spacing: 0.02em;
+}
+.sidebar-aside {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sidebar-aside::-webkit-scrollbar {
+  display: none;
+}
+nav {
+  display: flex;
+  flex-direction: column;
 }

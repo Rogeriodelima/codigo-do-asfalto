@@ -3,7 +3,14 @@ import Sidebar from "./Sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: "flex", minHeight: "100vh", width: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100dvh",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
       <Sidebar />
       <main
         className="main-conteudo"
@@ -11,9 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           flex: 1,
           minWidth: 0,
           maxWidth: "100%",
-          overflowY: "auto",
-          overflowX: "hidden",
-          minHeight: "100vh",
+          overflow: "hidden",
         }}
       >
         {children}
