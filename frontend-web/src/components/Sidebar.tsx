@@ -180,6 +180,7 @@ export default function Sidebar() {
           .main-conteudo {
             width: 100% !important;
             min-width: 0 !important;
+            padding-left: 56px;
           }
         }
 
@@ -427,13 +428,29 @@ export default function Sidebar() {
               </div>
             </div>
           ) : (
-            <button
-              style={estiloBtnRodape({
-                justifyContent: "center",
-              })}
-            >
-              <ALargeSmall size={16} />
-            </button>
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setEstado("expandida")}
+                style={estiloBtnRodape({
+                  justifyContent: "center",
+                })}
+                onMouseEnter={(e) => {
+                  onHover(e, true);
+                  setTooltip("Tamanho da fonte");
+                }}
+                onMouseLeave={(e) => {
+                  onHover(e, false);
+                  setTooltip(null);
+                }}
+              >
+                <ALargeSmall size={16} />
+              </button>
+
+              <Tooltip
+                label="Tamanho da fonte"
+                visible={tooltip === "Tamanho da fonte"}
+              />
+            </div>
           )}
 
           <button onClick={toggleAltoContraste} style={estiloBtnRodape()}>
