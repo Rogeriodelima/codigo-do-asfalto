@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import {
@@ -64,8 +64,8 @@ function Tooltip({ label, visible }: { label: string; visible: boolean }) {
 
 export default function Sidebar() {
   const [estado, setEstado] = useState<EstadoSidebar>("recolhida");
+
   const [tooltip, setTooltip] = useState<string | null>(null);
-  const [mobile, setMobile] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -79,18 +79,6 @@ export default function Sidebar() {
     altoContraste,
     toggleAltoContraste,
   } = useTema();
-
-  useEffect(() => {
-    function verificar() {
-      setMobile(window.innerWidth <= 1024);
-    }
-
-    verificar();
-
-    window.addEventListener("resize", verificar);
-
-    return () => window.removeEventListener("resize", verificar);
-  }, []);
 
   const escuro = tema === "escuro";
 
@@ -106,10 +94,7 @@ export default function Sidebar() {
 
   function navegar(href: string) {
     router.push(href);
-
-    if (mobile) {
-      setEstado("recolhida");
-    }
+    setEstado("recolhida");
   }
 
   function sair() {
@@ -183,22 +168,25 @@ export default function Sidebar() {
   return (
     <>
       <style>{`
-        .sidebar-aside {
-          position: sticky;
-          top: 0;
-        }
-
         @media (max-width: 1024px) {
           .sidebar-aside {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
-            z-index: 999 !important;
+            height: 100dvh !important;
+            z-index: 150 !important;
           }
 
           .main-conteudo {
             width: 100% !important;
             min-width: 0 !important;
+          }
+        }
+
+        @media (min-width: 1025px) {
+          .sidebar-aside {
+            position: sticky !important;
+            top: 0 !important;
           }
         }
       `}</style>
@@ -213,13 +201,15 @@ export default function Sidebar() {
           borderRight: `1px solid ${cor.borda}`,
           display: "flex",
           flexDirection: "column",
-          transition: "width 0.25s ease",
+          transition: "width 0.25s ease, min-width 0.25s ease",
           overflowX: "hidden",
           overflowY: "auto",
           flexShrink: 0,
+          top: 0,
           zIndex: 100,
         }}
       >
+        {/* Cabeçalho */}
         <div
           style={{
             borderBottom: `1px solid ${cor.borda}`,
@@ -280,28 +270,52 @@ export default function Sidebar() {
             </div>
           )}
 
-          <button
-            onClick={() =>
-              setEstado(estado === "expandida" ? "recolhida" : "expandida")
-            }
+          <div
             style={{
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: cor.texto,
-              padding: "8px",
               display: "flex",
               alignItems: "center",
+              gap: "4px",
             }}
           >
-            {estado === "expandida" ? (
-              <PanelLeftClose size={20} strokeWidth={1.75} />
-            ) : (
-              <Menu size={20} strokeWidth={1.75} />
+            <button
+              onClick={() =>
+                setEstado(estado === "expandida" ? "recolhida" : "expandida")
+              }
+              style={{
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                color: cor.texto,
+                padding: "8px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {estado === "expandida" ? (
+                <PanelLeftClose size={20} strokeWidth={1.75} />
+              ) : (
+                <Menu size={20} strokeWidth={1.75} />
+              )}
+            </button>
+
+            {estado === "expandida" && (
+              <button
+                onClick={() => setEstado("oculta")}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: cor.texto,
+                  fontSize: "10px",
+                }}
+              >
+                ocultar
+              </button>
             )}
-          </button>
+          </div>
         </div>
 
+        {/* Navegação */}
         <nav
           style={{
             flex: 1,
@@ -341,7 +355,9 @@ export default function Sidebar() {
                     justifyContent:
                       estado === "expandida" ? "flex-start" : "center",
                     background: ativo ? cor.fundoAtivo : "transparent",
-                    border: "none",
+                    borderTop: "none",
+                    borderRight: "none",
+                    borderBottom: "none",
                     borderLeft: `3px solid ${
                       ativo ? cor.ativo : "transparent"
                     }`,
@@ -352,7 +368,7 @@ export default function Sidebar() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Icon size={20} strokeWidth={1.75} />
+                  <Icon size={20} />
 
                   {estado === "expandida" && <span>{label}</span>}
                 </button>
@@ -364,6 +380,82 @@ export default function Sidebar() {
             );
           })}
         </nav>
+
+        {/* Rodapé */}
+        <div
+          style={{
+            borderTop: `1px solid ${cor.borda}`,
+            padding: "4px 0",
+            flexShrink: 0,
+          }}
+        >
+          {estado === "expandida" ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 16px",
+              }}
+            >
+              <ALargeSmall size={16} />
+
+              <div style={{ display: "flex", gap: "4px" }}>
+                {TAMANHOS.map(({ key, size }) => {
+                  const sel = tamanhoFonte === key;
+
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setTamanhoFonte(key)}
+                      style={{
+                        background: sel ? "#F2B705" : "transparent",
+                        border: `1px solid ${sel ? "#F2B705" : cor.borda}`,
+                        borderRadius: "4px",
+                        width: "24px",
+                        height: "24px",
+                        cursor: "pointer",
+                        color: sel ? "#0B1F3A" : cor.texto,
+                        fontSize: `${size}px`,
+                        fontWeight: "700",
+                      }}
+                    >
+                      A
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <button
+              style={estiloBtnRodape({
+                justifyContent: "center",
+              })}
+            >
+              <ALargeSmall size={16} />
+            </button>
+          )}
+
+          <button onClick={toggleAltoContraste} style={estiloBtnRodape()}>
+            <Contrast size={16} />
+
+            {estado === "expandida" && <span>Alto contraste</span>}
+          </button>
+
+          <button onClick={toggleTema} style={estiloBtnRodape()}>
+            {escuro ? <Sun size={16} /> : <Moon size={16} />}
+
+            {estado === "expandida" && (
+              <span>{escuro ? "Modo claro" : "Modo escuro"}</span>
+            )}
+          </button>
+
+          <button onClick={sair} style={estiloBtnRodape()}>
+            <LogOut size={16} />
+
+            {estado === "expandida" && <span>Sair</span>}
+          </button>
+        </div>
       </aside>
     </>
   );
