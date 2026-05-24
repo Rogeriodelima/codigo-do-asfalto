@@ -261,9 +261,11 @@ export default function Sidebar() {
                 style={{
                   fontFamily: "Anton, sans-serif",
                   fontSize: "11px",
-                  letterSpacing: "2px",
+                  letterSpacing: "1px",
                   color: cor.textoPrinc,
-                  whiteSpace: "nowrap",
+                  lineHeight: "1.1",
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
                 }}
               >
                 CÓDIGO DO ASFALTO
