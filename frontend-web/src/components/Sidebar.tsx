@@ -198,10 +198,10 @@ export default function Sidebar() {
         @media (max-width: 1024px) {
           .sidebar-aside {
             position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 300 !important;
-            height: 100dvh !important;
+            // top: 0 !important;
+            // left: 0 !important;
+            // z-index: 300 !important;
+            // height: 100dvh !important;
           }
 
           .main-conteudo {

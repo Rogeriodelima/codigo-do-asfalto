@@ -10,7 +10,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         width: "100%",
         minHeight: "100dvh",
         overflowX: "hidden",
-        background: "var(--fundo)",
       }}
     >
       <Sidebar />
@@ -20,9 +19,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         style={{
           flex: 1,
           minWidth: 0,
-          width: "100%",
-          overflowX: "hidden",
-          position: "relative",
         }}
       >
         {children}
