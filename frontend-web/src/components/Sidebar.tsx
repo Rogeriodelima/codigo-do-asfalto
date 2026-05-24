@@ -184,32 +184,43 @@ export default function Sidebar() {
       )}
 
       <style>{`
-      .sidebar-aside {
-        position: sticky;
-        top: 0;
-      }
+  @media (max-width: 1024px) {
 
-      @media (max-width: 1024px) {
-        .sidebar-aside {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          z-index: 999 !important;
-        }
+    .sidebar-aside {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      height: 100dvh;
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+    }
 
-        .main-conteudo {
-          width: 100% !important;
-          margin-left: 0 !important;
-        }
+    .sidebar-aside.aberta {
+      transform: translateX(0);
+    }
 
-        .sidebar-overlay {
-          display: block !important;
-        }
-      }
-    `}</style>
+    .sidebar-overlay {
+      display: block !important;
+    }
+
+    .main-conteudo {
+      width: 100% !important;
+      margin-left: 0 !important;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .sidebar-aside {
+      position: sticky;
+      top: 0;
+      transform: none !important;
+    }
+  }
+`}</style>
 
       <aside
-        className="sidebar-aside"
+        className={`sidebar-aside ${estado === "expandida" ? "aberta" : ""}`}
         style={{
           width: `${largura}px`,
           minWidth: `${largura}px`,
