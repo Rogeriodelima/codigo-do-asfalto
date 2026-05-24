@@ -184,43 +184,29 @@ export default function Sidebar() {
       )}
 
       <style>{`
+      .sidebar-aside {
+        position: sticky;
+        top: 0;
+      }
+
+      @media (max-width: 1024px) {
         .sidebar-aside {
-          position: sticky;
-          top: 0;
-          height: 100dvh;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          z-index: 999 !important;
         }
 
         .main-conteudo {
-          min-width: 0;
-          width: 100%;
+          width: 100% !important;
+          margin-left: 0 !important;
         }
 
-        @media (max-width: 1024px) {
-          .sidebar-aside {
-            position: fixed !important;
-            // top: 0 !important;
-            // left: 0 !important;
-            // z-index: 300 !important;
-            // height: 100dvh !important;
-          }
-
-          .main-conteudo {
-            width: 100%;
-            margin-left: 0 !important;
-          }
-
-          .sidebar-overlay {
-            display: block !important;
-          }
+        .sidebar-overlay {
+          display: block !important;
         }
-
-        @media (max-width: 768px) {
-          .sidebar-aside {
-            width: 56px !important;
-            min-width: 56px !important;
-          }
-        }
-      `}</style>
+      }
+    `}</style>
 
       <aside
         className="sidebar-aside"

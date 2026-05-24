@@ -143,7 +143,6 @@ export default function DashboardPage() {
           display: grid;
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
           gap: 24px;
-          width: 100%;
         }
 
         .card {
@@ -206,6 +205,18 @@ export default function DashboardPage() {
         @media (max-width: 1200px) {
           .grid-stats {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .grid-principal {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .conteudo { padding: 20px 16px; }
+
+          .grid-stats {
+            grid-template-columns: 1fr;
           }
 
           .grid-principal {
