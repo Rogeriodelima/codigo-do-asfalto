@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import {
@@ -65,8 +65,11 @@ function Tooltip({ label, visible }: { label: string; visible: boolean }) {
 export default function Sidebar() {
   const [estado, setEstado] = useState<EstadoSidebar>("recolhida");
   const [tooltip, setTooltip] = useState<string | null>(null);
+  const [mobile, setMobile] = useState(false);
+
   const router = useRouter();
   const pathname = usePathname();
+
   const {
     tema,
     toggleTema,
@@ -77,7 +80,20 @@ export default function Sidebar() {
     toggleAltoContraste,
   } = useTema();
 
+  useEffect(() => {
+    function verificar() {
+      setMobile(window.innerWidth <= 1024);
+    }
+
+    verificar();
+
+    window.addEventListener("resize", verificar);
+
+    return () => window.removeEventListener("resize", verificar);
+  }, []);
+
   const escuro = tema === "escuro";
+
   const cor = {
     bg: t.fundoCard,
     borda: t.borda,
@@ -90,7 +106,10 @@ export default function Sidebar() {
 
   function navegar(href: string) {
     router.push(href);
-    setEstado("recolhida");
+
+    if (mobile) {
+      setEstado("recolhida");
+    }
   }
 
   function sair() {
@@ -100,7 +119,7 @@ export default function Sidebar() {
   }
 
   const largura =
-    estado === "expandida" ? 240 : estado === "recolhida" ? 64 : 0;
+    estado === "expandida" ? 240 : estado === "recolhida" ? 56 : 0;
 
   function estiloBtnRodape(extra?: React.CSSProperties): React.CSSProperties {
     return {
@@ -154,12 +173,6 @@ export default function Sidebar() {
             display: "flex",
             alignItems: "center",
           }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.color = cor.ativo)
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.color = cor.texto)
-          }
         >
           <ChevronRight size={16} strokeWidth={1.75} />
         </button>
@@ -169,58 +182,29 @@ export default function Sidebar() {
 
   return (
     <>
-      {estado === "expandida" && (
-        <div
-          onClick={() => setEstado("recolhida")}
-          className="sidebar-overlay"
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            zIndex: 149,
-            display: "none",
-          }}
-        />
-      )}
-
       <style>{`
-  @media (max-width: 1024px) {
+        .sidebar-aside {
+          position: sticky;
+          top: 0;
+        }
 
-    .sidebar-aside {
-      position: fixed !important;
-      top: 0;
-      left: 0;
-      height: 100dvh;
-      z-index: 999;
-      transform: translateX(-100%);
-      transition: transform 0.25s ease;
-    }
+        @media (max-width: 1024px) {
+          .sidebar-aside {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 999 !important;
+          }
 
-    .sidebar-aside.aberta {
-      transform: translateX(0);
-    }
-
-    .sidebar-overlay {
-      display: block !important;
-    }
-
-    .main-conteudo {
-      width: 100% !important;
-      margin-left: 0 !important;
-    }
-  }
-
-  @media (min-width: 1025px) {
-    .sidebar-aside {
-      position: sticky;
-      top: 0;
-      transform: none !important;
-    }
-  }
-`}</style>
+          .main-conteudo {
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+        }
+      `}</style>
 
       <aside
-        className={`sidebar-aside ${estado === "expandida" ? "aberta" : ""}`}
+        className="sidebar-aside"
         style={{
           width: `${largura}px`,
           minWidth: `${largura}px`,
@@ -229,16 +213,13 @@ export default function Sidebar() {
           borderRight: `1px solid ${cor.borda}`,
           display: "flex",
           flexDirection: "column",
-          transition: "width 0.25s ease, min-width 0.25s ease",
+          transition: "width 0.25s ease",
           overflowX: "hidden",
           overflowY: "auto",
           flexShrink: 0,
-          top: 0,
           zIndex: 100,
-          willChange: "width",
         }}
       >
-        {/* Cabeçalho */}
         <div
           style={{
             borderBottom: `1px solid ${cor.borda}`,
@@ -284,6 +265,7 @@ export default function Sidebar() {
                   CDA
                 </span>
               </div>
+
               <span
                 style={{
                   fontFamily: "Anton, sans-serif",
@@ -291,7 +273,6 @@ export default function Sidebar() {
                   letterSpacing: "2px",
                   color: cor.textoPrinc,
                   whiteSpace: "nowrap",
-                  overflow: "hidden",
                 }}
               >
                 CÓDIGO DO ASFALTO
@@ -299,77 +280,32 @@ export default function Sidebar() {
             </div>
           )}
 
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <button
-              onClick={() =>
-                setEstado(estado === "expandida" ? "recolhida" : "expandida")
-              }
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: cor.texto,
-                padding: "8px",
-                display: "flex",
-                alignItems: "center",
-                borderRadius: "6px",
-                transition: "color 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = cor.ativo;
-                if (estado === "recolhida") setTooltip("Expandir menu");
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = cor.texto;
-                setTooltip(null);
-              }}
-            >
-              {estado === "expandida" ? (
-                <PanelLeftClose size={20} strokeWidth={1.75} />
-              ) : (
-                <Menu size={20} strokeWidth={1.75} />
-              )}
-            </button>
-            {estado === "recolhida" && (
-              <Tooltip
-                label="Expandir menu"
-                visible={tooltip === "Expandir menu"}
-              />
+          <button
+            onClick={() =>
+              setEstado(estado === "expandida" ? "recolhida" : "expandida")
+            }
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: cor.texto,
+              padding: "8px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {estado === "expandida" ? (
+              <PanelLeftClose size={20} strokeWidth={1.75} />
+            ) : (
+              <Menu size={20} strokeWidth={1.75} />
             )}
-          </div>
-
-          {estado === "expandida" && (
-            <button
-              onClick={() => setEstado("oculta")}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                color: cor.texto,
-                padding: "4px",
-                fontSize: "10px",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                borderRadius: "4px",
-                transition: "color 0.15s",
-              }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = cor.ativo)
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = cor.texto)
-              }
-            >
-              ocultar
-            </button>
-          )}
+          </button>
         </div>
 
-        {/* Navegação */}
         <nav
           style={{
             flex: 1,
             padding: "4px 0",
-            overflowY: "hidden",
             minHeight: 0,
           }}
         >
@@ -377,6 +313,7 @@ export default function Sidebar() {
             const ativo =
               pathname === href ||
               (href !== "/dashboard" && pathname.startsWith(href + "/"));
+
             return (
               <div key={href} style={{ position: "relative" }}>
                 <button
@@ -385,12 +322,14 @@ export default function Sidebar() {
                     if (!ativo)
                       (e.currentTarget as HTMLElement).style.background =
                         cor.hover;
+
                     if (estado === "recolhida") setTooltip(label);
                   }}
                   onMouseLeave={(e) => {
                     if (!ativo)
                       (e.currentTarget as HTMLElement).style.background =
                         "transparent";
+
                     setTooltip(null);
                   }}
                   style={{
@@ -402,27 +341,22 @@ export default function Sidebar() {
                     justifyContent:
                       estado === "expandida" ? "flex-start" : "center",
                     background: ativo ? cor.fundoAtivo : "transparent",
-                    borderTop: "none",
-                    borderRight: "none",
-                    borderBottom: "none",
-                    borderLeft: `3px solid ${ativo ? cor.ativo : "transparent"}`,
+                    border: "none",
+                    borderLeft: `3px solid ${
+                      ativo ? cor.ativo : "transparent"
+                    }`,
                     cursor: "pointer",
                     color: ativo ? cor.ativo : cor.texto,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                     fontSize: "13px",
                     fontWeight: ativo ? "700" : "500",
-                    textAlign: "left",
-                    transition: "background 0.15s, color 0.15s",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  <Icon
-                    size={20}
-                    strokeWidth={ativo ? 2.5 : 1.75}
-                    style={{ flexShrink: 0 }}
-                  />
+                  <Icon size={20} strokeWidth={1.75} />
+
                   {estado === "expandida" && <span>{label}</span>}
                 </button>
+
                 {estado === "recolhida" && (
                   <Tooltip label={label} visible={tooltip === label} />
                 )}
@@ -430,171 +364,6 @@ export default function Sidebar() {
             );
           })}
         </nav>
-
-        {/* Rodapé */}
-        <div
-          style={{
-            borderTop: `1px solid ${cor.borda}`,
-            padding: "4px 0",
-            flexShrink: 0,
-          }}
-        >
-          {/* Tamanho de fonte */}
-          {estado === "expandida" ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "8px 16px",
-              }}
-            >
-              <ALargeSmall
-                size={16}
-                strokeWidth={1.75}
-                style={{ color: cor.texto, flexShrink: 0 }}
-              />
-              <div style={{ display: "flex", gap: "4px" }}>
-                {TAMANHOS.map(({ key, size }) => {
-                  const sel = tamanhoFonte === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setTamanhoFonte(key)}
-                      style={{
-                        background: sel ? "#F2B705" : "transparent",
-                        border: `1px solid ${sel ? "#F2B705" : cor.borda}`,
-                        borderRadius: "4px",
-                        width: "24px",
-                        height: "24px",
-                        cursor: "pointer",
-                        color: sel ? "#0B1F3A" : cor.texto,
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        fontSize: `${size}px`,
-                        fontWeight: "700",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      A
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setEstado("expandida")}
-                style={estiloBtnRodape({ justifyContent: "center" })}
-                onMouseEnter={(e) => {
-                  onHover(e, true);
-                  setTooltip("Tamanho da fonte");
-                }}
-                onMouseLeave={(e) => {
-                  onHover(e, false);
-                  setTooltip(null);
-                }}
-              >
-                <ALargeSmall
-                  size={16}
-                  strokeWidth={1.75}
-                  style={{ flexShrink: 0 }}
-                />
-              </button>
-              <Tooltip
-                label="Tamanho da fonte"
-                visible={tooltip === "Tamanho da fonte"}
-              />
-            </div>
-          )}
-
-          {/* Alto contraste */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={toggleAltoContraste}
-              style={estiloBtnRodape({
-                color: altoContraste ? cor.ativo : cor.texto,
-              })}
-              onMouseEnter={(e) => {
-                onHover(e, true);
-                if (estado === "recolhida") setTooltip("Alto contraste");
-              }}
-              onMouseLeave={(e) => {
-                onHover(e, false);
-                setTooltip(null);
-              }}
-            >
-              <Contrast
-                size={16}
-                strokeWidth={1.75}
-                style={{ flexShrink: 0 }}
-              />
-              {estado === "expandida" && <span>Alto contraste</span>}
-            </button>
-            {estado === "recolhida" && (
-              <Tooltip
-                label="Alto contraste"
-                visible={tooltip === "Alto contraste"}
-              />
-            )}
-          </div>
-
-          {/* Modo claro/escuro */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={toggleTema}
-              style={estiloBtnRodape()}
-              onMouseEnter={(e) => {
-                onHover(e, true);
-                if (estado === "recolhida")
-                  setTooltip(escuro ? "Modo claro" : "Modo escuro");
-              }}
-              onMouseLeave={(e) => {
-                onHover(e, false);
-                setTooltip(null);
-              }}
-            >
-              {escuro ? (
-                <Sun size={16} strokeWidth={1.75} style={{ flexShrink: 0 }} />
-              ) : (
-                <Moon size={16} strokeWidth={1.75} style={{ flexShrink: 0 }} />
-              )}
-              {estado === "expandida" && (
-                <span>{escuro ? "Modo claro" : "Modo escuro"}</span>
-              )}
-            </button>
-            {estado === "recolhida" && (
-              <Tooltip
-                label={escuro ? "Modo claro" : "Modo escuro"}
-                visible={tooltip === "Modo claro" || tooltip === "Modo escuro"}
-              />
-            )}
-          </div>
-
-          {/* Sair */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={sair}
-              style={estiloBtnRodape()}
-              onMouseEnter={(e) => {
-                onHover(e, true);
-                if (estado === "recolhida") setTooltip("Sair");
-              }}
-              onMouseLeave={(e) => {
-                onHover(e, false);
-                setTooltip(null);
-              }}
-            >
-              <LogOut size={16} strokeWidth={1.75} style={{ flexShrink: 0 }} />
-              {estado === "expandida" && <span>Sair</span>}
-            </button>
-            {estado === "recolhida" && (
-              <Tooltip label="Sair" visible={tooltip === "Sair"} />
-            )}
-          </div>
-        </div>
       </aside>
     </>
   );
