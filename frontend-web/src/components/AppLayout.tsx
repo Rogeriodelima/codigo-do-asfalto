@@ -1,4 +1,5 @@
 "use client";
+
 import Sidebar from "./Sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -6,19 +7,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div
       style={{
         display: "flex",
-        height: "100dvh",
         width: "100%",
-        overflow: "hidden",
+        minHeight: "100dvh",
+        overflowX: "hidden",
+        background: "var(--fundo)",
       }}
     >
       <Sidebar />
+
       <main
         className="main-conteudo"
         style={{
           flex: 1,
           minWidth: 0,
-          maxWidth: "100%",
-          overflow: "hidden",
+          width: "100%",
+          overflowX: "hidden",
+          position: "relative",
         }}
       >
         {children}

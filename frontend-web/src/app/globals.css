@@ -14,15 +14,22 @@
   --texto-secundario: #8fa3b8;
 }
 
-* {
-  line-height: 1.2 !important;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+* {
   margin: 0;
   padding: 0;
 }
 
-html {
-  font-size: clamp(14px, 1.2vw + 10px, 18px);
+html,
+body {
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 body {
@@ -30,7 +37,22 @@ body {
   color: var(--texto-principal);
   font-family: "Plus Jakarta Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.2 !important;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 h1,
@@ -42,14 +64,18 @@ h6 {
   font-family: "Anton", sans-serif;
   letter-spacing: 0.02em;
 }
+
 .sidebar-aside {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 .sidebar-aside::-webkit-scrollbar {
   display: none;
 }
-nav {
-  display: flex;
-  flex-direction: column;
+
+.main-conteudo {
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
 }

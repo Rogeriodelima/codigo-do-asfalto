@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import AppLayout from "@/components/AppLayout";
 
-
 interface DashboardData {
   usuario: { nome: string; foto_url: string | null };
   nivel: {
@@ -113,35 +112,63 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        .dashboard { min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .conteudo { padding: 32px; max-width: 1100px; }
+        * {
+          box-sizing: border-box;
+        }
+
+        .dashboard {
+          min-height: 100dvh;
+          width: 100%;
+          overflow-x: hidden;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .conteudo {
+          width: 100%;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 32px;
+          min-width: 0;
+        }
+
         .grid-stats {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
           margin-bottom: 32px;
+          width: 100%;
         }
-        @media (min-width: 900px) {
-          .grid-stats {
-            grid-template-columns: repeat(4, 1fr);
-          }
+
+        .grid-principal {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: 24px;
+          width: 100%;
         }
-        .grid-principal { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .card { border: 1px solid ${t.borda}; border-radius: 16px; padding: 24px; }
+
+        .card {
+          border: 1px solid ${t.borda};
+          border-radius: 16px;
+          padding: 24px;
+          min-width: 0;
+          overflow: hidden;
+        }
+
         .barra-progresso {
           height: 8px;
           background: ${t.borda};
-          border-radius: 99px;
+          border-radius: 999px;
           overflow: hidden;
           margin: 12px 0;
         }
+
         .barra-preenchida {
           height: 100%;
           background: linear-gradient(90deg, #F2B705, #F97316);
-          border-radius: 99px;
+          border-radius: 999px;
           transition: width 1s ease;
         }
+
         .btn-nav {
           background: transparent;
           border: none;
@@ -152,25 +179,53 @@ export default function DashboardPage() {
           font-family: Plus Jakarta Sans, sans-serif;
           font-weight: 700;
         }
+
         .exp-item {
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 16px;
           padding: 14px 0;
           border-bottom: 1px solid ${t.borda};
+          min-width: 0;
         }
-        .exp-item:last-child { border-bottom: none; }
+
+        .exp-item:last-child {
+          border-bottom: none;
+        }
+
         .badge-status {
           padding: 4px 10px;
-          border-radius: 99px;
+          border-radius: 999px;
           font-size: 10px;
           letter-spacing: 1px;
           font-weight: 600;
+          white-space: nowrap;
         }
-        @media (max-width: 900px) {
-          .conteudo { padding: 20px 16px; }
-          .grid-stats { grid-template-columns: 1fr 1fr; }
-          .grid-principal { grid-template-columns: 1fr; }
+
+        @media (max-width: 1200px) {
+          .grid-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .grid-principal {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .conteudo {
+            padding: 20px 16px;
+          }
+
+          .grid-stats {
+            grid-template-columns: 1fr;
+          }
+
+          .exp-item {
+            flex-direction: column;
+            align-items: flex-start;
+          }
         }
       `}</style>
 

@@ -100,7 +100,7 @@ export default function Sidebar() {
   }
 
   const largura =
-    estado === "expandida" ? 240 : estado === "recolhida" ? 56 : 0;
+    estado === "expandida" ? 240 : estado === "recolhida" ? 64 : 0;
 
   function estiloBtnRodape(extra?: React.CSSProperties): React.CSSProperties {
     return {
@@ -184,23 +184,41 @@ export default function Sidebar() {
       )}
 
       <style>{`
+        .sidebar-aside {
+          position: sticky;
+          top: 0;
+          height: 100dvh;
+        }
+
+        .main-conteudo {
+          min-width: 0;
+          width: 100%;
+        }
+
         @media (max-width: 1024px) {
-          .sidebar-overlay { display: block !important; }
           .sidebar-aside {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
-            height: 100% !important;
-            z-index: 150 !important;
+            z-index: 300 !important;
+            height: 100dvh !important;
           }
+
           .main-conteudo {
-            margin-left: 56px;
-            width: calc(100% - 56px);
+            width: 100%;
+            margin-left: 0 !important;
+          }
+
+          .sidebar-overlay {
+            display: block !important;
           }
         }
-        @media (min-width: 1025px) {
-          .sidebar-aside { position: sticky !important; }
-          .main-conteudo { margin-left: 0; width: auto; }
+
+        @media (max-width: 768px) {
+          .sidebar-aside {
+            width: 56px !important;
+            min-width: 56px !important;
+          }
         }
       `}</style>
 
@@ -210,13 +228,13 @@ export default function Sidebar() {
           width: `${largura}px`,
           minWidth: `${largura}px`,
           height: "100dvh",
-          maxHeight: "100dvh",
           background: cor.bg,
           borderRight: `1px solid ${cor.borda}`,
           display: "flex",
           flexDirection: "column",
           transition: "width 0.25s ease, min-width 0.25s ease",
-          overflow: "clip",
+          overflowX: "hidden",
+          overflowY: "auto",
           flexShrink: 0,
           top: 0,
           zIndex: 100,
