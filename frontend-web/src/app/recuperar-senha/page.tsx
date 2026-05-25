@@ -235,7 +235,7 @@ export default function RecuperarSenhaPage() {
                     textAlign: "center",
                   }}
                 >
-                  <div style={{ fontSize: "32px", marginBottom: "12px" }}>✓</div>
+                  <div style={{ fontSize: "32px", marginBottom: "12px", color: t.textoPrincipal }}>✓</div>
                   <p
                     style={{
                       color: t.textoPrincipal,

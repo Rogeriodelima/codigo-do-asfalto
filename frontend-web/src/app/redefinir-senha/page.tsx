@@ -260,7 +260,7 @@ export default function RedefinirSenhaPage() {
                   textAlign: "center",
                 }}
               >
-                <div style={{ fontSize: "32px", marginBottom: "12px" }}>✓</div>
+                <div style={{ fontSize: "32px", marginBottom: "12px", color: t.textoPrincipal }}>✓</div>
                 <p style={{ color: t.textoPrincipal, fontSize: "14px", lineHeight: "1.6" }}>
                   Senha redefinida com sucesso! Você será redirecionado ao login em instantes.
                 </p>
