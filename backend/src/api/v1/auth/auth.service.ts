@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../../utils/prisma";
-import { getChaveAtiva, encrypt } from "../../../utils/crypto";
+import { getChaveAtiva, encrypt, getChavePorId, decrypt } from "../../../utils/crypto";
 import { enviarEmailBoasVindas } from "../../../utils/email";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -19,19 +19,30 @@ export async function registrarUsuario(dados: {
   codigo_convite: string;
   tenant_id: number;
 }) {
-  // Valida convite
+  // Valida convite — email_convidado é criptografado com IV aleatório,
+  // não é possível comparar no banco. Busca pelo código e compara em memória.
   const convite = await prisma.convite.findFirst({
     where: {
       codigo: dados.codigo_convite,
-      email_convidado: dados.email,
       status: "PENDENTE",
       tenant_id: dados.tenant_id,
       data_expiracao: { gte: new Date() },
+      deleted_at: null,
     },
   });
 
   if (!convite) {
-    throw new Error("Convite invalido, expirado ou nao vinculado a este email");
+    throw new Error("Convite invalido, expirado ou ja utilizado");
+  }
+
+  let emailConvite = convite.email_convidado;
+  if (convite.chave_cripto_id) {
+    const chave = await getChavePorId(prisma as any, convite.chave_cripto_id);
+    emailConvite = decrypt(convite.email_convidado, chave);
+  }
+
+  if (emailConvite.toLowerCase() !== dados.email.toLowerCase()) {
+    throw new Error("Email nao corresponde ao convite");
   }
 
   // Verifica se email ja existe

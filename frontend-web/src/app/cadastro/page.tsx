@@ -91,10 +91,11 @@ export default function CadastroPage() {
     setErro("");
     setLoading(true);
     try {
+      console.log('Enviando:', { codigo: codigoConvite.trim(), email: email.trim() });
       const res = await apiFetch("/api/v1/convites/validar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ codigo: codigoConvite, email }),
+        body: JSON.stringify({ codigo: codigoConvite.trim(), email: email.trim() }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -139,6 +140,8 @@ export default function CadastroPage() {
       if (celular) body.celular = celular;
       if (moto) body.moto = moto;
       if (nivel) body.nivel = nivel;
+
+      console.log('Enviando para /api/v1/auth/registro:', body);
 
       const res = await apiFetch("/api/v1/auth/registro", {
         method: "POST",
