@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { postConvite, getConvites, deleteConvite } from "./convites.controller";
+import {
+  postConvite,
+  postValidarConvite,
+  getConvites,
+  deleteConvite,
+} from "./convites.controller";
 import { autenticar } from "../../../middlewares/auth.middleware";
 import { validarTenant } from "../../../middlewares/tenant.middleware";
 
@@ -11,6 +16,43 @@ const router = Router();
  *   name: Convites
  *   description: Gerenciamento de convites
  */
+
+/**
+ * @swagger
+ * /api/v1/convites/validar:
+ *   post:
+ *     summary: Valida um código de convite antes do cadastro
+ *     tags: [Convites]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [codigo, email]
+ *             properties:
+ *               codigo:
+ *                 type: string
+ *                 example: "A1B2C3D4"
+ *               email:
+ *                 type: string
+ *                 example: "convidado@email.com"
+ *     responses:
+ *       200:
+ *         description: Convite válido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tenant_id:
+ *                   type: integer
+ *                 nome_tenant:
+ *                   type: string
+ *       400:
+ *         description: Convite inválido, expirado, já utilizado ou email não confere
+ */
+router.post("/validar", postValidarConvite);
 
 /**
  * @swagger

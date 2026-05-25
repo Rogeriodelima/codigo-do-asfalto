@@ -9,6 +9,48 @@ import { randomBytes } from "crypto";
 import { enviarEmailConvite } from "../../../utils/email";
 
 // =============================================
+// VALIDAR CONVITE (pré-cadastro, sem autenticação)
+// =============================================
+
+export async function validarConvite(dados: {
+  codigo: string;
+  email: string;
+}) {
+  const convite = await prisma.convite.findFirst({
+    where: {
+      codigo: dados.codigo,
+      status: "PENDENTE",
+      data_expiracao: { gte: new Date() },
+      deleted_at: null,
+    },
+    include: {
+      tenant: { select: { id: true, nome: true } },
+    },
+  });
+
+  if (!convite) {
+    throw new Error("Convite invalido, expirado ou ja utilizado");
+  }
+
+  // O email_convidado é criptografado com IV aleatório — não é possível comparar
+  // diretamente no banco. Descriptografa para comparar em memória.
+  let emailConvite = convite.email_convidado;
+  if (convite.chave_cripto_id) {
+    const chave = await getChavePorId(prisma as any, convite.chave_cripto_id);
+    emailConvite = decrypt(convite.email_convidado, chave);
+  }
+
+  if (emailConvite.toLowerCase() !== dados.email.toLowerCase()) {
+    throw new Error("Email nao corresponde ao convite");
+  }
+
+  return {
+    tenant_id: convite.tenant_id,
+    nome_tenant: convite.tenant.nome,
+  };
+}
+
+// =============================================
 // GERAR CONVITE
 // =============================================
 

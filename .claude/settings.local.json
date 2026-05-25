@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Projetos\\\\CDA\\\\frontend-web\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "Bash(if [ ! -d \"c:/Projetos/CDA/frontend-web/src/app/cadastro\" ]; then mkdir -p \"c:/Projetos/CDA/frontend-web/src/app/cadastro\"; fi)",
+      "Bash(npx tsc *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Projetos\\\\CDA\\\\backend\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(Head -50)",
+      "Bash(ls -la \"C:\\\\Projetos\\\\CDA\\\\\" | head -20)",
+      "Read(//c/Projetos/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Projetos\\CDA\\frontend-web\\src\\app"
+    ]
+  }
+}

@@ -3,7 +3,27 @@ import {
   gerarConvite,
   listarConvites,
   cancelarConvite,
+  validarConvite,
 } from "./convites.service";
+
+// POST /api/v1/convites/validar
+export async function postValidarConvite(req: Request, res: Response) {
+  try {
+    const { codigo, email } = req.body;
+
+    if (!codigo || !email) {
+      return res.status(400).json({
+        error: "Campos obrigatorios: codigo, email",
+      });
+    }
+
+    const resultado = await validarConvite({ codigo, email });
+
+    return res.status(200).json(resultado);
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+}
 
 // POST /api/v1/convites
 export async function postConvite(req: Request, res: Response) {
