@@ -1,8 +1,9 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { prisma } from "../../../utils/prisma";
 import { getChaveAtiva, encrypt, getChavePorId, decrypt } from "../../../utils/crypto";
-import { enviarEmailBoasVindas } from "../../../utils/email";
+import { enviarEmailBoasVindas, enviarEmailRecuperacaoSenha } from "../../../utils/email";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
@@ -202,6 +203,69 @@ export async function loginUsuario(dados: {
       tenant_id: dados.tenant_id,
     },
   };
+}
+
+// =============================================
+// RECUPERAR SENHA
+// =============================================
+
+export async function recuperarSenha(email: string) {
+  const usuario = await prisma.usuario.findUnique({ where: { email } });
+
+  // Responde com sucesso mesmo quando email não existe para evitar enumeração
+  if (!usuario || !usuario.ativo || !usuario.senha_hash) return;
+
+  // Invalida tokens anteriores ainda não usados
+  await prisma.tokenResetSenha.updateMany({
+    where: { usuario_id: usuario.id, usado: false },
+    data: { usado: true },
+  });
+
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiracao = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+  await prisma.tokenResetSenha.create({
+    data: { usuario_id: usuario.id, token, expiracao },
+  });
+
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+  const link = `${frontendUrl}/redefinir-senha?token=${token}`;
+
+  await enviarEmailRecuperacaoSenha({
+    email_destinatario: email,
+    nome_usuario: usuario.nome,
+    link_reset: link,
+  });
+}
+
+// =============================================
+// REDEFINIR SENHA
+// =============================================
+
+export async function redefinirSenha(token: string, nova_senha: string) {
+  const registro = await prisma.tokenResetSenha.findFirst({
+    where: {
+      token,
+      usado: false,
+      expiracao: { gte: new Date() },
+    },
+  });
+
+  if (!registro) {
+    throw new Error("Token invalido ou expirado");
+  }
+
+  const senha_hash = await bcrypt.hash(nova_senha, 12);
+
+  await prisma.usuario.update({
+    where: { id: registro.usuario_id },
+    data: { senha_hash },
+  });
+
+  await prisma.tokenResetSenha.update({
+    where: { id: registro.id },
+    data: { usado: true },
+  });
 }
 
 // =============================================

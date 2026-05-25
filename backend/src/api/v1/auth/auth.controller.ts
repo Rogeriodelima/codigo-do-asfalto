@@ -4,6 +4,8 @@ import {
   loginUsuario,
   loginGoogle,
   loginInstagram,
+  recuperarSenha as recuperarSenhaService,
+  redefinirSenha as redefinirSenhaService,
 } from "./auth.service";
 
 // =============================================
@@ -62,6 +64,53 @@ export async function login(req: Request, res: Response) {
     return res.status(200).json(resultado);
   } catch (error: any) {
     return res.status(401).json({ error: error.message });
+  }
+}
+
+// =============================================
+// RECUPERAR SENHA
+// =============================================
+
+export async function recuperarSenha(req: Request, res: Response) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Campo obrigatorio: email" });
+    }
+
+    await recuperarSenhaService(email);
+
+    // Sempre responde com sucesso para não revelar se o email existe
+    return res.status(200).json({
+      message: "Se o email estiver cadastrado, voce recebera as instrucoes em breve",
+    });
+  } catch {
+    return res.status(500).json({ error: "Erro ao processar solicitacao" });
+  }
+}
+
+// =============================================
+// REDEFINIR SENHA
+// =============================================
+
+export async function redefinirSenha(req: Request, res: Response) {
+  try {
+    const { token, nova_senha } = req.body;
+
+    if (!token || !nova_senha) {
+      return res.status(400).json({ error: "Campos obrigatorios: token, nova_senha" });
+    }
+
+    if (nova_senha.length < 6) {
+      return res.status(400).json({ error: "A senha deve ter no minimo 6 caracteres" });
+    }
+
+    await redefinirSenhaService(token, nova_senha);
+
+    return res.status(200).json({ message: "Senha redefinida com sucesso" });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
   }
 }
 

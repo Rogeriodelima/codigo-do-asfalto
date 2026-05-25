@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registro, login, authGoogle, authInstagram } from "./auth.controller";
+import { registro, login, authGoogle, authInstagram, recuperarSenha, redefinirSenha } from "./auth.controller";
 
 const router = Router();
 
@@ -111,5 +111,53 @@ router.post("/google", authGoogle);
  *         description: Token inválido
  */
 router.post("/instagram", authInstagram);
+
+/**
+ * @swagger
+ * /api/v1/auth/recuperar-senha:
+ *   post:
+ *     summary: Solicita recuperação de senha por email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Instruções enviadas (mesmo se email não existir)
+ */
+router.post("/recuperar-senha", recuperarSenha);
+
+/**
+ * @swagger
+ * /api/v1/auth/redefinir-senha:
+ *   post:
+ *     summary: Redefine a senha com token recebido por email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token, nova_senha]
+ *             properties:
+ *               token:
+ *                 type: string
+ *               nova_senha:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Senha redefinida com sucesso
+ *       400:
+ *         description: Token inválido ou expirado
+ */
+router.post("/redefinir-senha", redefinirSenha);
 
 export default router;

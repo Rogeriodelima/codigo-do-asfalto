@@ -102,8 +102,26 @@ model Usuario {
   validacoes       Validacao[]
   logs             AuditoriaLog[]
   validador_tenants ValidadorTenant[]
+  tokens_reset      TokenResetSenha[]
 
   @@map("usuarios")
+}
+
+// =============================================================
+// TOKEN RESET SENHA
+// =============================================================
+
+model TokenResetSenha {
+  id          Int      @id @default(autoincrement())
+  usuario_id  Int
+  token       String   @unique
+  expiracao   DateTime
+  usado       Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  usuario     Usuario  @relation(fields: [usuario_id], references: [id])
+
+  @@map("tokens_reset_senha")
 }
 
 // =============================================================

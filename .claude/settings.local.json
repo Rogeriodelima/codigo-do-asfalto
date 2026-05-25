@@ -9,7 +9,9 @@
       "Bash(Select-Object FullName)",
       "Bash(Head -50)",
       "Bash(ls -la \"C:\\\\Projetos\\\\CDA\\\\\" | head -20)",
-      "Read(//c/Projetos/**)"
+      "Read(//c/Projetos/**)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos\\\\CDA\" -Recurse -Directory | Where-Object {$_.Name -match \"backend|frontend\"} | Select-Object -First 10 | ForEach-Object {$_.FullName})",
+      "Bash(npx prisma *)"
     ],
     "additionalDirectories": [
       "c:\\Projetos\\CDA\\frontend-web\\src\\app"

@@ -315,7 +315,7 @@ export default function LoginPage() {
 
               <div style={{ textAlign: "right", marginBottom: "28px" }}>
                 <a
-                  href="#"
+                  href="/recuperar-senha"
                   style={{
                     color: t.textoSecundario,
                     fontSize: "13px",
