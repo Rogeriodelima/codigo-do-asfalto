@@ -210,32 +210,37 @@ export async function loginUsuario(dados: {
 // =============================================
 
 export async function recuperarSenha(email: string) {
-  const usuario = await prisma.usuario.findUnique({ where: { email } });
+  try {
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
 
-  // Responde com sucesso mesmo quando email não existe para evitar enumeração
-  if (!usuario || !usuario.ativo || !usuario.senha_hash) return;
+    // Responde com sucesso mesmo quando email não existe para evitar enumeração
+    if (!usuario || !usuario.ativo || !usuario.senha_hash) return;
 
-  // Invalida tokens anteriores ainda não usados
-  await prisma.tokenResetSenha.updateMany({
-    where: { usuario_id: usuario.id, usado: false },
-    data: { usado: true },
-  });
+    // Invalida tokens anteriores ainda não usados
+    await prisma.tokenResetSenha.updateMany({
+      where: { usuario_id: usuario.id, usado: false },
+      data: { usado: true },
+    });
 
-  const token = crypto.randomBytes(32).toString("hex");
-  const expiracao = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiracao = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-  await prisma.tokenResetSenha.create({
-    data: { usuario_id: usuario.id, token, expiracao },
-  });
+    await prisma.tokenResetSenha.create({
+      data: { usuario_id: usuario.id, token, expiracao },
+    });
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-  const link = `${frontendUrl}/redefinir-senha?token=${token}`;
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const link = `${frontendUrl}/redefinir-senha?token=${token}`;
 
-  await enviarEmailRecuperacaoSenha({
-    email_destinatario: email,
-    nome_usuario: usuario.nome,
-    link_reset: link,
-  });
+    await enviarEmailRecuperacaoSenha({
+      email_destinatario: email,
+      nome_usuario: usuario.nome,
+      link_reset: link,
+    });
+  } catch (error) {
+    console.error("Erro recuperar senha:", error);
+    throw error;
+  }
 }
 
 // =============================================
