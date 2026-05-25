@@ -87,7 +87,7 @@ export async function recuperarSenha(req: Request, res: Response) {
     });
   } catch (error) {
     console.error("Erro recuperar senha:", error);
-    return res.status(500).json({ error: error instanceof Error ? error.message : "Erro desconhecido" });
+    return res.status(500).json({ error: "Erro ao processar solicitacao" });
   }
 }
 
