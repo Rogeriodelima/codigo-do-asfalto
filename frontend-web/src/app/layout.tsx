@@ -17,6 +17,8 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Código do Asfalto",
   description: "Evolução. Experiência. Propósito.",
+  manifest: "/manifest.json",
+  themeColor: "#0B1F3A",
 };
 
 export default function RootLayout({
