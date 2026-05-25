@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Anton, Plus_Jakarta_Sans } from "next/font/google";
 import { TemaProvider } from "@/contexts/TemaContext";
 import "./globals.css";
@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Código do Asfalto",
   description: "Evolução. Experiência. Propósito.",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#0B1F3A",
 };
 

@@ -1,11 +1,19 @@
 "use client";
 import { apiFetch } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
 import ToggleTema from "@/components/ToggleTema";
 
 export default function RedefinirSenhaPage() {
+  return (
+    <Suspense>
+      <RedefinirSenhaForm />
+    </Suspense>
+  );
+}
+
+function RedefinirSenhaForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTema();
