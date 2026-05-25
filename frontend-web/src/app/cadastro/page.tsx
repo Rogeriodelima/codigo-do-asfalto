@@ -22,7 +22,6 @@ export default function CadastroPage() {
 
   // Etapa 3
   const [moto, setMoto] = useState("");
-  const [nivel, setNivel] = useState("");
 
   const [tenantId, setTenantId] = useState<number | null>(null);
   const [nomeTenant, setNomeTenant] = useState("");
@@ -139,7 +138,6 @@ export default function CadastroPage() {
       };
       if (celular) body.celular = celular;
       if (moto) body.moto = moto;
-      if (nivel) body.nivel = nivel;
 
       console.log('Enviando para /api/v1/auth/registro:', body);
 
@@ -591,35 +589,6 @@ export default function CadastroPage() {
                     onFocus={(e) => (e.target.style.borderColor = "#F2B705")}
                     onBlur={(e) => (e.target.style.borderColor = t.borda)}
                   />
-                </div>
-
-                <div style={{ marginBottom: "32px" }}>
-                  <label style={labelStyle}>
-                    Nível de experiência{" "}
-                    <span
-                      style={{
-                        color: t.textoSecundario,
-                        fontWeight: "normal",
-                        letterSpacing: "0",
-                        textTransform: "none",
-                      }}
-                    >
-                      — opcional
-                    </span>
-                  </label>
-                  <select
-                    value={nivel}
-                    onChange={(e) => setNivel(e.target.value)}
-                    style={{ ...inputStyle, cursor: "pointer" }}
-                    onFocus={(e) => (e.target.style.borderColor = "#F2B705")}
-                    onBlur={(e) => (e.target.style.borderColor = t.borda)}
-                  >
-                    <option value="">Selecione seu nível</option>
-                    <option value="iniciante">Iniciante — até 1 ano</option>
-                    <option value="intermediario">Intermediário — 1 a 5 anos</option>
-                    <option value="avancado">Avançado — 5 a 10 anos</option>
-                    <option value="expert">Expert — mais de 10 anos</option>
-                  </select>
                 </div>
 
                 <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
