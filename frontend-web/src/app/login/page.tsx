@@ -23,7 +23,7 @@ export default function LoginPage() {
       const res = await apiFetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha, tenant_id: 1 }),
+        body: JSON.stringify({ email, senha }),
       });
 
       const data = await res.json();
@@ -35,8 +35,25 @@ export default function LoginPage() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
+      const tenantRes = await apiFetch("/api/v1/usuarios/me/tenants");
+      if (tenantRes.ok) {
+        const tenantData = await tenantRes.json();
+        const tenants = Array.isArray(tenantData)
+          ? tenantData
+          : (tenantData.tenants ?? []);
+
+        if (tenants.length > 1) {
+          router.push("/selecionar-tenant");
+          return;
+        }
+        if (tenants.length === 1) {
+          localStorage.setItem("tenant_id", String(tenants[0].id));
+        }
+      }
+
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setErro("Erro de conexao com o servidor");
     } finally {
       setLoading(false);
