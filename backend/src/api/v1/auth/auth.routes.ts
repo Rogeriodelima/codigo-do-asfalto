@@ -43,6 +43,7 @@ router.post("/registro", registro);
  * /api/v1/auth/login:
  *   post:
  *     summary: Realiza login com email e senha
+ *     description: Autentica o usuário e retorna um JWT sem contexto de tenant. Use GET /api/v1/usuarios/me/tenants para listar os tenants disponíveis e selecionar um antes de acessar endpoints tenant-scoped.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -54,11 +55,31 @@ router.post("/registro", registro);
  *             properties:
  *               email:
  *                 type: string
+ *                 example: usuario@email.com
  *               senha:
  *                 type: string
+ *                 example: "••••••••"
  *     responses:
  *       200:
- *         description: Login realizado com sucesso, retorna JWT
+ *         description: Login realizado com sucesso, retorna JWT pré-tenant
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       400:
+ *         description: Campos obrigatórios ausentes
  *       401:
  *         description: Credenciais inválidas
  */

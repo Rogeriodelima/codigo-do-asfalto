@@ -129,7 +129,6 @@ export async function registrarUsuario(dados: {
 export async function loginUsuario(dados: {
   email: string;
   senha: string;
-  tenant_id: number;
 }) {
   // Busca usuario
   let usuario;
@@ -157,41 +156,19 @@ export async function loginUsuario(dados: {
     throw new Error("Email ou senha invalidos");
   }
 
-  // Verifica vinculo com tenant separadamente
-  const usuarioTenant = await prisma.usuarioTenant.findFirst({
-    where: {
-      usuario_id: usuario.id,
-      tenant_id: dados.tenant_id,
-      status: "ATIVO",
-      deleted_at: null,
-    },
-  });
-
-  if (!usuarioTenant) {
-    throw new Error("Usuario nao tem acesso a este tenant");
-  }
-
-  // Gera token JWT
+  // Gera token sem tenant_id — o tenant é selecionado após o login
+  // tenant_id: 0 impede acesso a endpoints tenant-scoped (validarTenant rejeita)
+  // mas permite chamar GET /api/v1/usuarios/me/tenants para listar os tenants
   const token = jwt.sign(
     {
       id: usuario.id,
       email: usuario.email,
-      tenant_id: dados.tenant_id,
-      nivel: usuarioTenant.nivel_atual,
+      tenant_id: 0,
+      nivel: 0,
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,
   );
-
-  // Log de auditoria
-  await prisma.auditoriaLog.create({
-    data: {
-      tenant_id: dados.tenant_id,
-      usuario_id: usuario.id,
-      tipo_log: "ACESSO",
-      acao: "LOGIN",
-    },
-  });
 
   return {
     token,
@@ -199,8 +176,6 @@ export async function loginUsuario(dados: {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      nivel: usuarioTenant.nivel_atual,
-      tenant_id: dados.tenant_id,
     },
   };
 }

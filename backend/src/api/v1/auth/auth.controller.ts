@@ -47,19 +47,15 @@ export async function registro(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
   try {
-    const { email, senha, tenant_id } = req.body;
+    const { email, senha } = req.body;
 
-    if (!email || !senha || !tenant_id) {
+    if (!email || !senha) {
       return res.status(400).json({
-        error: "Campos obrigatorios: email, senha, tenant_id",
+        error: "Campos obrigatorios: email, senha",
       });
     }
 
-    const resultado = await loginUsuario({
-      email,
-      senha,
-      tenant_id: Number(tenant_id),
-    });
+    const resultado = await loginUsuario({ email, senha });
 
     return res.status(200).json(resultado);
   } catch (error: any) {
