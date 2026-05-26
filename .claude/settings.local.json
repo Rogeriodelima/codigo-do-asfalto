@@ -14,7 +14,10 @@
       "Bash(npx prisma *)",
       "Bash(npm install *)",
       "Bash(Get-ChildItem -Path \"c:\\\\Projetos\\\\CDA\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Projetos\\\\CDA\\\\backend\" -Force)",
+      "Bash(Select-Object -Property Name, FullName)",
+      "Bash(dir \"c:\\\\Projetos\\\\CDA\\\\backend\\\\src\\\\api\\\\v1\\\\usuarios\")"
     ],
     "additionalDirectories": [
       "c:\\Projetos\\CDA\\frontend-web\\src\\app"
