@@ -55,7 +55,8 @@ export const TEMAS = {
     erroTexto: "#FCA5A5",
     labelCor: "#F2B705",
     labelPeso: "400",
-    fundoEsquerdo: "linear-gradient(135deg, #0B1F3A 0%, #060F1C 50%, #0D2847 100%)",
+    fundoEsquerdo:
+      "linear-gradient(135deg, #0B1F3A 0%, #060F1C 50%, #0D2847 100%)",
     fundoStat: "#0D1F35",
     fundoProximo: "#060F1C",
     bordaProximo: "#1A3A5C",
@@ -72,18 +73,20 @@ const TAMANHOS: Record<TamanhoFonte, string> = {
 const TemaContext = createContext<TemaContextType>({} as TemaContextType);
 
 export function TemaProvider({ children }: { children: ReactNode }) {
-  const [tema, setTema] = useState<Tema>("claro");
-  const [tamanhoFonte, setTamanhoFonteState] = useState<TamanhoFonte>("normal");
-  const [altoContraste, setAltoContraste] = useState(false);
+  const [tema, setTema] = useState<Tema>(() => {
+    if (typeof window === "undefined") return "escuro";
+    return (localStorage.getItem("tema") as Tema) || "escuro";
+  });
 
-  useEffect(() => {
-    const salvoTema = localStorage.getItem("tema") as Tema;
-    const salvoFonte = localStorage.getItem("tamanhoFonte") as TamanhoFonte;
-    const salvoContraste = localStorage.getItem("altoContraste");
-    if (salvoTema) setTema(salvoTema);
-    if (salvoFonte) setTamanhoFonteState(salvoFonte);
-    if (salvoContraste) setAltoContraste(salvoContraste === "true");
-  }, []);
+  const [tamanhoFonte, setTamanhoFonteState] = useState<TamanhoFonte>(() => {
+    if (typeof window === "undefined") return "normal";
+    return (localStorage.getItem("tamanhoFonte") as TamanhoFonte) || "normal";
+  });
+
+  const [altoContraste, setAltoContraste] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("altoContraste") === "true";
+  });
 
   useEffect(() => {
     document.documentElement.style.fontSize = TAMANHOS[tamanhoFonte];
@@ -115,15 +118,17 @@ export function TemaProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <TemaContext.Provider value={{
-      tema,
-      toggleTema,
-      tamanhoFonte,
-      setTamanhoFonte,
-      altoContraste,
-      toggleAltoContraste,
-      t: TEMAS[tema],
-    }}>
+    <TemaContext.Provider
+      value={{
+        tema,
+        toggleTema,
+        tamanhoFonte,
+        setTamanhoFonte,
+        altoContraste,
+        toggleAltoContraste,
+        t: TEMAS[tema],
+      }}
+    >
       {children}
     </TemaContext.Provider>
   );
