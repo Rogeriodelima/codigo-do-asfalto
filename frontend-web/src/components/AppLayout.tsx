@@ -1,8 +1,11 @@
 "use client";
 
 import Sidebar from "./Sidebar";
+import { useTema } from "@/contexts/TemaContext";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTema();
+
   return (
     <div
       style={{
@@ -10,6 +13,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         width: "100%",
         minHeight: "100dvh",
         overflowX: "hidden",
+        background: t.fundo,
       }}
     >
       <Sidebar />
@@ -21,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           minWidth: 0,
           width: "100%",
           overflowX: "hidden",
+          background: t.fundo,
         }}
       >
         {children}
