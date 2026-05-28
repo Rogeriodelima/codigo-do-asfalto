@@ -156,15 +156,20 @@ export async function loginUsuario(dados: {
     throw new Error("Email ou senha invalidos");
   }
 
-  // Gera token sem tenant_id — o tenant é selecionado após o login
-  // tenant_id: 0 impede acesso a endpoints tenant-scoped (validarTenant rejeita)
-  // mas permite chamar GET /api/v1/usuarios/me/tenants para listar os tenants
+  // Busca o nivel do tenant padrão (ou primeiro ativo) para incluir no JWT.
+  // tenant_id permanece 0 até o usuário chamar /usuarios/selecionar-tenant;
+  // o nivel aqui é uma aproximação pré-seleção — o JWT definitivo vem depois.
+  const usuarioTenantPadrao = await prisma.usuarioTenant.findFirst({
+    where: { usuario_id: usuario.id, status: "ATIVO", deleted_at: null },
+    orderBy: [{ tenant_padrao: "desc" }, { created_at: "asc" }],
+  });
+
   const token = jwt.sign(
     {
       id: usuario.id,
       email: usuario.email,
       tenant_id: 0,
-      nivel: 0,
+      nivel: usuarioTenantPadrao?.nivel_atual ?? 0,
     },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,

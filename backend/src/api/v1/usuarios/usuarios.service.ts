@@ -1,4 +1,8 @@
+import jwt from "jsonwebtoken";
 import { prisma } from "../../../utils/prisma";
+
+const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 // =============================================
 // BUSCAR TENANTS DO USUÁRIO AUTENTICADO
@@ -28,4 +32,53 @@ export async function buscarTenantsPorUsuario(usuario_id: number) {
     nome: ut.tenant.nome,
     logo_url: ut.tenant.logo_url,
   }));
+}
+
+// =============================================
+// SELECIONAR TENANT — GERA JWT DEFINITIVO
+// =============================================
+
+export async function selecionarTenant(
+  usuario_id: number,
+  tenant_id: number,
+) {
+  const usuarioTenant = await prisma.usuarioTenant.findFirst({
+    where: { usuario_id, tenant_id, status: "ATIVO", deleted_at: null },
+    include: {
+      usuario: { select: { id: true, nome: true, email: true } },
+    },
+  });
+
+  if (!usuarioTenant) {
+    throw new Error("Usuario nao tem acesso a este tenant");
+  }
+
+  const nivel = usuarioTenant.nivel_atual;
+
+  const token = jwt.sign(
+    { id: usuario_id, email: usuarioTenant.usuario.email, tenant_id, nivel },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,
+  );
+
+  await prisma.auditoriaLog.create({
+    data: {
+      tenant_id,
+      usuario_id,
+      tipo_log: "ACESSO",
+      acao: "SELECIONAR_TENANT",
+      valor_novo: { tenant_id },
+    },
+  });
+
+  return {
+    token,
+    usuario: {
+      id: usuarioTenant.usuario.id,
+      nome: usuarioTenant.usuario.nome,
+      email: usuarioTenant.usuario.email,
+      nivel,
+      tenant_id,
+    },
+  };
 }

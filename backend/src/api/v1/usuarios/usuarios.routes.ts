@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMeTenants } from "./usuarios.controller";
+import { getMeTenants, postSelecionarTenant } from "./usuarios.controller";
 import { autenticar } from "../../../middlewares/auth.middleware";
 
 const router = Router();
@@ -46,5 +46,57 @@ const router = Router();
  *         description: Erro ao buscar tenants
  */
 router.get("/me/tenants", autenticar, getMeTenants);
+
+/**
+ * @swagger
+ * /api/v1/usuarios/selecionar-tenant:
+ *   post:
+ *     summary: Seleciona o tenant ativo e emite JWT definitivo
+ *     description: Valida o acesso do usuário ao tenant informado e retorna um novo JWT com tenant_id e nivel preenchidos. Deve ser chamado após GET /me/tenants quando o usuário tem mais de um tenant.
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [tenant_id]
+ *             properties:
+ *               tenant_id:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       200:
+ *         description: JWT definitivo emitido com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     nivel:
+ *                       type: integer
+ *                     tenant_id:
+ *                       type: integer
+ *       400:
+ *         description: tenant_id ausente
+ *       401:
+ *         description: Token não fornecido ou inválido
+ *       403:
+ *         description: Usuário não tem acesso a este tenant
+ */
+router.post("/selecionar-tenant", autenticar, postSelecionarTenant);
 
 export default router;
