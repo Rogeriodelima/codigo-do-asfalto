@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { getMeTenants, postSelecionarTenant } from "./usuarios.controller";
+import {
+  getMeTenants,
+  getMePerfil,
+  postSelecionarTenant,
+} from "./usuarios.controller";
 import { autenticar } from "../../../middlewares/auth.middleware";
 
 const router = Router();
@@ -46,6 +50,40 @@ const router = Router();
  *         description: Erro ao buscar tenants
  */
 router.get("/me/tenants", autenticar, getMeTenants);
+
+/**
+ * @swagger
+ * /api/v1/usuarios/me/perfil:
+ *   get:
+ *     summary: Retorna o perfil e nível do usuário no tenant atual
+ *     description: Busca o registro em usuario_tenants usando o usuario_id e tenant_id presentes no JWT. Retorna perfil derivado do nivel_atual (ADMIN ≥ 6, GESTOR = 5, MEMBRO < 5).
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfil retornado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 perfil:
+ *                   type: string
+ *                   enum: [ADMIN, GESTOR, MEMBRO]
+ *                   example: GESTOR
+ *                 nivel:
+ *                   type: integer
+ *                   example: 5
+ *                 tenant_id:
+ *                   type: integer
+ *                   example: 1
+ *       400:
+ *         description: tenant_id ausente no token ou vínculo não encontrado
+ *       401:
+ *         description: Token não fornecido ou inválido
+ */
+router.get("/me/perfil", autenticar, getMePerfil);
 
 /**
  * @swagger

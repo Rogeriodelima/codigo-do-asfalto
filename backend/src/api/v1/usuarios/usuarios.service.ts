@@ -35,6 +35,26 @@ export async function buscarTenantsPorUsuario(usuario_id: number) {
 }
 
 // =============================================
+// BUSCAR PERFIL DO USUÁRIO NO TENANT ATUAL
+// =============================================
+
+export async function buscarPerfilDoUsuario(
+  usuario_id: number,
+  tenant_id: number,
+) {
+  const ut = await prisma.usuarioTenant.findFirst({
+    where: { usuario_id, tenant_id, status: "ATIVO", deleted_at: null },
+  });
+
+  if (!ut) throw new Error("Vínculo não encontrado para este tenant");
+
+  const nivel = ut.nivel_atual;
+  const perfil = nivel >= 6 ? "ADMIN" : nivel >= 5 ? "GESTOR" : "MEMBRO";
+
+  return { perfil, nivel, tenant_id };
+}
+
+// =============================================
 // SELECIONAR TENANT — GERA JWT DEFINITIVO
 // =============================================
 
