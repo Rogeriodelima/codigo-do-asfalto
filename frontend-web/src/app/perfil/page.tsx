@@ -310,7 +310,6 @@ export default function PerfilPage() {
         .perfil-wrapper {
           width: 100%;
           min-height: 100dvh;
-          background: ${t.fundo};
         }
 
         .perfil-container {
@@ -373,7 +372,7 @@ export default function PerfilPage() {
         }
       `}</style>
 
-      <div className="perfil-wrapper">
+      <div className="perfil-wrapper" style={{ background: t.fundo, color: t.textoPrincipal, width: "100%", minHeight: "100dvh" }}>
         <div className="perfil-container">
           <div style={{ marginBottom: "32px" }}>
             <h1
