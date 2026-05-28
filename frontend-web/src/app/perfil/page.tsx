@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, API_URL } from "@/lib/api";
 import AppLayout from "@/components/AppLayout";
 
 interface Perfil {
@@ -64,6 +64,11 @@ export default function PerfilPage() {
   const [erroMoto, setErroMoto] = useState("");
   const [removendoId, setRemovendoId] = useState<number | null>(null);
 
+  const [fotoAtual, setFotoAtual] = useState<string | null>(null);
+  const [uploadandoFoto, setUploadandoFoto] = useState(false);
+  const [erroFoto, setErroFoto] = useState("");
+  const inputFotoRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -89,6 +94,7 @@ export default function PerfilPage() {
 
       const dadosPerfil: Perfil = await resPerfil.json();
       setPerfil(dadosPerfil);
+      setFotoAtual(dadosPerfil.foto_url);
       setFormNome(dadosPerfil.nome ?? "");
       setFormNomeExibido(dadosPerfil.nome_exibido ?? "");
       setFormCelular(dadosPerfil.celular ?? "");
@@ -188,6 +194,34 @@ export default function PerfilPage() {
       // silencia
     } finally {
       setRemovendoId(null);
+    }
+  }
+
+  async function handleUploadFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+    setErroFoto("");
+    setUploadandoFoto(true);
+    try {
+      const formData = new FormData();
+      formData.append("foto", arquivo);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/v1/perfil/foto`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErroFoto(data.error || "Erro ao fazer upload");
+        return;
+      }
+      setFotoAtual(data.foto_url);
+    } catch {
+      setErroFoto("Erro de conexão com o servidor");
+    } finally {
+      setUploadandoFoto(false);
+      if (inputFotoRef.current) inputFotoRef.current.value = "";
     }
   }
 
@@ -358,6 +392,7 @@ export default function PerfilPage() {
               }}
             >
               <div
+                onClick={() => !uploadandoFoto && inputFotoRef.current?.click()}
                 style={{
                   width: "80px",
                   height: "80px",
@@ -371,10 +406,33 @@ export default function PerfilPage() {
                   fontSize: "32px",
                   color: "#F2B705",
                   flexShrink: 0,
+                  cursor: uploadandoFoto ? "default" : "pointer",
+                  overflow: "hidden",
+                  position: "relative",
                 }}
+                title="Clique para alterar a foto"
               >
-                {inicial}
+                {uploadandoFoto ? (
+                  <span style={{ fontSize: "11px", letterSpacing: "1px" }}>...</span>
+                ) : fotoAtual ? (
+                  <img
+                    src={fotoAtual}
+                    alt="Foto de perfil"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  inicial
+                )}
               </div>
+
+              <input
+                ref={inputFotoRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: "none" }}
+                onChange={handleUploadFoto}
+              />
+
               <div>
                 <div
                   style={{
@@ -386,16 +444,29 @@ export default function PerfilPage() {
                 >
                   {perfil?.nome_exibido || perfil?.nome}
                 </div>
-                <div
-                  style={{
-                    color: t.textoSecundario,
-                    fontSize: "13px",
-                    marginTop: "4px",
-                    fontFamily: "Plus Jakarta Sans, sans-serif",
-                  }}
-                >
-                  Upload de foto disponível em breve
-                </div>
+                {erroFoto ? (
+                  <div
+                    style={{
+                      color: t.erroTexto,
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontFamily: "Plus Jakarta Sans, sans-serif",
+                    }}
+                  >
+                    {erroFoto}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      color: t.textoSecundario,
+                      fontSize: "13px",
+                      marginTop: "4px",
+                      fontFamily: "Plus Jakarta Sans, sans-serif",
+                    }}
+                  >
+                    {uploadandoFoto ? "Enviando..." : "Clique no avatar para alterar a foto"}
+                  </div>
+                )}
               </div>
             </div>
 
