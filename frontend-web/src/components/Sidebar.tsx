@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useTema } from "@/contexts/TemaContext";
+import { apiFetch } from "@/lib/api";
 import {
   LayoutDashboard,
   ScrollText,
@@ -17,6 +18,10 @@ import {
   ALargeSmall,
   Contrast,
   ChevronRight,
+  Shield,
+  ClipboardCheck,
+  UserPlus,
+  Users,
 } from "lucide-react";
 
 type TamanhoFonte = "normal" | "grande" | "maior";
@@ -28,6 +33,13 @@ const NAV_ITEMS = [
   { href: "/timeline", icon: GitBranch, label: "Timeline" },
   { href: "/evolucao", icon: TrendingUp, label: "Evolução" },
   { href: "/perfil", icon: User, label: "Perfil" },
+];
+
+const NAV_ADMIN_ITEMS = [
+  { href: "/admin/dashboard", icon: LayoutDashboard, label: "Painel" },
+  { href: "/admin/validacoes", icon: ClipboardCheck, label: "Validações" },
+  { href: "/admin/convites", icon: UserPlus, label: "Convites" },
+  { href: "/admin/membros", icon: Users, label: "Membros" },
 ];
 
 const TAMANHOS: { key: TamanhoFonte; size: number }[] = [
@@ -64,11 +76,21 @@ function Tooltip({ label, visible }: { label: string; visible: boolean }) {
 
 export default function Sidebar() {
   const [estado, setEstado] = useState<EstadoSidebar>("recolhida");
-
   const [tooltip, setTooltip] = useState<string | null>(null);
+  const [modoAdmin, setModoAdmin] = useState(false);
+  const [podeAdmin, setPodeAdmin] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setModoAdmin(localStorage.getItem("modoAdmin") === "true");
+
+    apiFetch("/api/v1/usuarios/me/perfil")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => { if (data?.nivel >= 5) setPodeAdmin(true); })
+      .catch(() => {});
+  }, []);
 
   const {
     tema,
@@ -101,6 +123,13 @@ export default function Sidebar() {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     router.push("/login");
+  }
+
+  function alternarModoAdmin() {
+    const novo = !modoAdmin;
+    setModoAdmin(novo);
+    localStorage.setItem("modoAdmin", String(novo));
+    router.push(novo ? "/admin/validacoes" : "/dashboard");
   }
 
   const largura =
@@ -326,7 +355,7 @@ export default function Sidebar() {
             minHeight: 0,
           }}
         >
-          {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          {(modoAdmin ? NAV_ADMIN_ITEMS : NAV_ITEMS).map(({ href, icon: Icon, label }) => {
             const ativo =
               pathname === href ||
               (href !== "/dashboard" && pathname.startsWith(href + "/"));
@@ -468,6 +497,23 @@ export default function Sidebar() {
               <span>{escuro ? "Modo claro" : "Modo escuro"}</span>
             )}
           </button>
+
+          {podeAdmin && (
+            <button
+              onClick={alternarModoAdmin}
+              style={estiloBtnRodape(
+                modoAdmin ? { color: "#F2B705" } : undefined
+              )}
+              onMouseEnter={(e) => onHover(e, true)}
+              onMouseLeave={(e) => onHover(e, false)}
+            >
+              <Shield size={16} />
+
+              {estado === "expandida" && (
+                <span>{modoAdmin ? "Modo Piloto" : "Painel Admin"}</span>
+              )}
+            </button>
+          )}
 
           <button onClick={sair} style={estiloBtnRodape()}>
             <LogOut size={16} />
