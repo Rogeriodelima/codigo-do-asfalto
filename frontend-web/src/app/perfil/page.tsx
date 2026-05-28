@@ -24,6 +24,7 @@ interface Moto {
   ano: number | null;
   cor: string | null;
   identificador: string | null;
+  foto_url: string | null;
 }
 
 interface FormMoto {
@@ -68,6 +69,10 @@ export default function PerfilPage() {
   const [uploadandoFoto, setUploadandoFoto] = useState(false);
   const [erroFoto, setErroFoto] = useState("");
   const inputFotoRef = useRef<HTMLInputElement>(null);
+
+  const [uploadandoFotoMoto, setUploadandoFotoMoto] = useState<Record<number, boolean>>({});
+  const [erroFotoMoto, setErroFotoMoto] = useState<Record<number, string>>({});
+  const inputFotoMotoRefs = useRef<Record<number, HTMLInputElement | null>>({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -222,6 +227,37 @@ export default function PerfilPage() {
     } finally {
       setUploadandoFoto(false);
       if (inputFotoRef.current) inputFotoRef.current.value = "";
+    }
+  }
+
+  async function handleUploadFotoMoto(motoId: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+    setErroFotoMoto((prev) => ({ ...prev, [motoId]: "" }));
+    setUploadandoFotoMoto((prev) => ({ ...prev, [motoId]: true }));
+    try {
+      const formData = new FormData();
+      formData.append("foto", arquivo);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/v1/equipamentos/${motoId}/foto`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErroFotoMoto((prev) => ({ ...prev, [motoId]: data.error || "Erro ao fazer upload" }));
+        return;
+      }
+      setMotos((prev) =>
+        prev.map((m) => (m.id === motoId ? { ...m, foto_url: data.foto_url } : m)),
+      );
+    } catch {
+      setErroFotoMoto((prev) => ({ ...prev, [motoId]: "Erro de conexão" }));
+    } finally {
+      setUploadandoFotoMoto((prev) => ({ ...prev, [motoId]: false }));
+      const input = inputFotoMotoRefs.current[motoId];
+      if (input) input.value = "";
     }
   }
 
@@ -610,7 +646,42 @@ export default function PerfilPage() {
             ) : (
               motos.map((moto) => (
                 <div key={moto.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "16px", border: `1px solid ${t.borda}`, borderRadius: "12px", marginBottom: "10px", background: t.fundo, flexWrap: "wrap" }}>
-                  <div style={{ minWidth: 0 }}>
+                  {/* Thumbnail */}
+                  <div
+                    onClick={() => !uploadandoFotoMoto[moto.id] && inputFotoMotoRefs.current[moto.id]?.click()}
+                    title="Clique para adicionar foto"
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
+                      background: "#0B1F3A",
+                      border: `2px solid ${erroFotoMoto[moto.id] ? t.erroBorda : t.borda}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      cursor: uploadandoFotoMoto[moto.id] ? "default" : "pointer",
+                      overflow: "hidden",
+                      fontSize: "22px",
+                    }}
+                  >
+                    {uploadandoFotoMoto[moto.id] ? (
+                      <span style={{ fontSize: "10px", color: "#F2B705" }}>...</span>
+                    ) : moto.foto_url ? (
+                      <img src={moto.foto_url} alt={moto.modelo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      "🏍️"
+                    )}
+                  </div>
+                  <input
+                    ref={(el) => { inputFotoMotoRefs.current[moto.id] = el; }}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleUploadFotoMoto(moto.id, e)}
+                  />
+
+                  <div style={{ minWidth: 0, flex: 1 }}>
                     <div
                       style={{
                         fontFamily: "Anton, sans-serif",

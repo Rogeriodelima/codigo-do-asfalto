@@ -5,6 +5,7 @@ import {
   getChavePorId,
   decrypt,
 } from "../../../utils/crypto";
+import { uploadArquivo, deletarArquivo } from "../../../utils/storage";
 
 // =============================================
 // LISTAR EQUIPAMENTOS
@@ -197,6 +198,54 @@ export async function atualizarEquipamento(
   });
 
   return { message: "Equipamento atualizado com sucesso" };
+}
+
+// =============================================
+// ATUALIZAR FOTO DO EQUIPAMENTO
+// =============================================
+
+export async function atualizarFotoEquipamento(
+  id: number,
+  usuario_id: number,
+  tenant_id: number,
+  buffer: Buffer,
+  contentType: string,
+  extensao: string,
+): Promise<string> {
+  const eq = await prisma.equipamento.findFirst({
+    where: { id, usuario_id, tenant_id, deleted_at: null },
+    select: { foto_url: true },
+  });
+
+  if (!eq) throw new Error("Equipamento nao encontrado");
+
+  const nomeArquivo = `fotos-motos/${id}-${Date.now()}.${extensao}`;
+
+  const publicUrl = (process.env.R2_PUBLIC_URL ?? "")
+    .replace(/^R2_PUBLIC_URL=/i, "")
+    .replace(/\/+$/, "");
+  if (eq.foto_url && publicUrl && eq.foto_url.startsWith(publicUrl)) {
+    const chaveAntiga = eq.foto_url.replace(`${publicUrl}/`, "");
+    await deletarArquivo(chaveAntiga).catch(() => {});
+  }
+
+  const url = await uploadArquivo(buffer, nomeArquivo, contentType);
+
+  await prisma.equipamento.update({ where: { id }, data: { foto_url: url } });
+
+  await prisma.auditoriaLog.create({
+    data: {
+      tenant_id,
+      usuario_id,
+      tipo_log: "ACAO",
+      tabela: "equipamentos",
+      registro_id: id,
+      acao: "UPDATE_FOTO_EQUIPAMENTO",
+      valor_novo: { foto_url: url },
+    },
+  });
+
+  return url;
 }
 
 // =============================================

@@ -5,7 +5,14 @@ import {
   criarEquipamento,
   atualizarEquipamento,
   desativarEquipamento,
+  atualizarFotoEquipamento,
 } from "./equipamentos.service";
+
+const MIME_PERMITIDOS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
 
 // GET /api/v1/equipamentos
 export async function getEquipamentos(req: Request, res: Response) {
@@ -78,6 +85,41 @@ export async function putEquipamento(req: Request, res: Response) {
     return res.status(200).json(resultado);
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
+  }
+}
+
+// POST /api/v1/equipamentos/:id/foto
+export async function postFotoEquipamento(req: Request, res: Response) {
+  try {
+    const usuario_id = req.usuario!.id;
+    const tenant_id = req.usuario!.tenant_id;
+    const id = Number(req.params.id);
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Arquivo nao enviado" });
+    }
+
+    const contentType = req.file.mimetype;
+    const extensao = MIME_PERMITIDOS[contentType];
+
+    if (!extensao) {
+      return res
+        .status(400)
+        .json({ error: "Tipo de arquivo invalido. Use jpeg, png ou webp" });
+    }
+
+    const url = await atualizarFotoEquipamento(
+      id,
+      usuario_id,
+      tenant_id,
+      req.file.buffer,
+      contentType,
+      extensao,
+    );
+
+    return res.status(200).json({ foto_url: url });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
   }
 }
 
