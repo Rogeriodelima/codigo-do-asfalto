@@ -28,7 +28,7 @@ body {
 }
 
 body {
-  /* background-color: var(--fundo); */
+  background-color: var(--fundo);
   color: var(--texto-principal);
   font-family: "Plus Jakarta Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
