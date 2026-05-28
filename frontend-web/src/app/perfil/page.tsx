@@ -304,76 +304,15 @@ export default function PerfilPage() {
 
   return (
     <AppLayout>
-      <style>{`
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        .perfil-wrapper {
-          width: 100%;
-          min-height: 100dvh;
-        }
-
-        .perfil-container {
-          max-width: 720px;
-          margin: 0 auto;
-          padding: 32px 24px;
-          width: 100%;
-        }
-
-        .perfil-grid-2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-        }
-
-        .moto-card {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 16px;
-          border: 1px solid ${t.borda};
-          border-radius: 12px;
-          margin-bottom: 10px;
-          background: ${t.fundo};
-        }
-
-        .moto-acoes {
-          display: flex;
-          gap: 8px;
-          flex-shrink: 0;
-        }
-
-        .modal-backdrop {
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.55);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 500;
-          padding: 16px;
-        }
-
-        .modal-box {
-          background: ${t.fundoCard};
-          border: 1px solid ${t.borda};
-          border-radius: 16px;
-          padding: 28px;
-          width: 100%;
-          max-width: 460px;
-          max-height: 90dvh;
-          overflow-y: auto;
-        }
-
-        @media (max-width: 600px) {
-          .perfil-container { padding: 20px 16px; }
-          .perfil-grid-2 { grid-template-columns: 1fr; }
-          .moto-card { flex-wrap: wrap; }
-        }
-      `}</style>
-
-      <div className="perfil-wrapper" style={{ background: t.fundo, color: t.textoPrincipal, width: "100%", minHeight: "100dvh" }}>
-        <div className="perfil-container">
+      <div
+        style={{
+          background: t.fundo,
+          color: t.textoPrincipal,
+          width: "100%",
+          minHeight: "100dvh",
+        }}
+      >
+        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 24px", width: "100%" }}>
           <div style={{ marginBottom: "32px" }}>
             <h1
               style={{
@@ -461,7 +400,7 @@ export default function PerfilPage() {
             </div>
 
             <form onSubmit={salvarPerfil}>
-              <div className="perfil-grid-2" style={{ marginBottom: "16px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <label style={labelStyle}>Nome completo</label>
                   <input
@@ -599,7 +538,7 @@ export default function PerfilPage() {
               </div>
             ) : (
               motos.map((moto) => (
-                <div key={moto.id} className="moto-card">
+                <div key={moto.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "16px", border: `1px solid ${t.borda}`, borderRadius: "12px", marginBottom: "10px", background: t.fundo, flexWrap: "wrap" }}>
                   <div style={{ minWidth: 0 }}>
                     <div
                       style={{
@@ -666,7 +605,7 @@ export default function PerfilPage() {
                     </div>
                   </div>
 
-                  <div className="moto-acoes">
+                  <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
                     <button
                       onClick={() => {
                         setErroMoto("");
@@ -705,12 +644,12 @@ export default function PerfilPage() {
 
       {formMoto !== null && (
         <div
-          className="modal-backdrop"
+          style={{ position: "fixed", inset: "0", background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 500, padding: "16px" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setFormMoto(null);
           }}
         >
-          <div className="modal-box">
+          <div style={{ background: t.fundoCard, border: `1px solid ${t.borda}`, borderRadius: "16px", padding: "28px", width: "100%", maxWidth: "460px", maxHeight: "90dvh", overflowY: "auto" }}>
             <h3
               style={{
                 fontFamily: "Anton, sans-serif",
@@ -739,7 +678,7 @@ export default function PerfilPage() {
                 />
               </div>
 
-              <div className="perfil-grid-2" style={{ marginBottom: "16px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <label style={labelStyle}>Ano</label>
                   <input
