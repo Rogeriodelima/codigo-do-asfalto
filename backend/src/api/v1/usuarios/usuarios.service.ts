@@ -48,10 +48,7 @@ export async function buscarPerfilDoUsuario(
 
   if (!ut) throw new Error("Vínculo não encontrado para este tenant");
 
-  const nivel = ut.nivel_atual;
-  const perfil = nivel >= 6 ? "ADMIN" : nivel >= 5 ? "GESTOR" : "MEMBRO";
-
-  return { perfil, nivel, tenant_id };
+  return { perfil: ut.perfil, tenant_id };
 }
 
 // =============================================
@@ -74,9 +71,10 @@ export async function selecionarTenant(
   }
 
   const nivel = usuarioTenant.nivel_atual;
+  const perfil = usuarioTenant.perfil;
 
   const token = jwt.sign(
-    { id: usuario_id, email: usuarioTenant.usuario.email, tenant_id, nivel },
+    { id: usuario_id, email: usuarioTenant.usuario.email, tenant_id, nivel, perfil },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,
   );

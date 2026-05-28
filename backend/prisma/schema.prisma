@@ -129,14 +129,15 @@ model TokenResetSenha {
 // =============================================================
 
 model UsuarioTenant {
-  id            Int                @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   usuario_id    Int
   tenant_id     Int
-  nivel_atual   Int                @default(1)
-  tenant_padrao Boolean            @default(false)
+  perfil        PerfilTenant        @default(MEMBRO)
+  nivel_atual   Int                 @default(1)
+  tenant_padrao Boolean             @default(false)
   status        StatusUsuarioTenant @default(ATIVO)
-  created_at    DateTime           @default(now())
-  updated_at    DateTime           @updatedAt
+  created_at    DateTime            @default(now())
+  updated_at    DateTime            @updatedAt
   deleted_at    DateTime?
 
   usuario       Usuario @relation(fields: [usuario_id], references: [id])
@@ -144,6 +145,13 @@ model UsuarioTenant {
 
   @@unique([usuario_id, tenant_id])
   @@map("usuario_tenants")
+}
+
+enum PerfilTenant {
+  MEMBRO
+  VALIDADOR
+  GESTOR
+  ADMIN
 }
 
 enum StatusUsuarioTenant {

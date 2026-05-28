@@ -8,6 +8,7 @@ export interface TokenPayload {
   email: string;
   tenant_id: number;
   nivel: number;
+  perfil: string;
 }
 
 declare global {
