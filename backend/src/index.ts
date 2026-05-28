@@ -15,6 +15,7 @@ import evolucaoRoutes from "./api/v1/evolucao/evolucao.routes";
 import conteudosRoutes from "./api/v1/conteudos/conteudos.routes";
 import usuariosRoutes from "./api/v1/usuarios/usuarios.routes";
 import auditoriaRoutes from "./api/v1/auditoria/auditoria.routes";
+import { tenantDominio } from "./middlewares/tenantDominio.middleware";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(tenantDominio);
 
 // Log de requisicoes em desenvolvimento
 if (process.env.NODE_ENV === "development") {

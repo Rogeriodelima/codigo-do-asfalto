@@ -6,7 +6,11 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: 'Codigo do Asfalto - API',
       version: '1.0.0',
-      description: 'Documentacao das APIs da plataforma Codigo do Asfalto',
+      description: `Documentacao das APIs da plataforma Codigo do Asfalto.
+
+**Resolução de tenant por domínio**
+
+Todas as requisições passam pelo middleware \`tenantDominio\`, que lê o cabeçalho \`Host\` e busca na tabela \`tenants\` um registro com \`dominio\` igual ao host recebido (ex: \`bmw.codigodoasfalto.com.br\`). Se encontrado, o \`tenant_id\` é injetado em \`req.tenantDominioId\` e fica disponível para as rotas. Caso contrário, a requisição segue normalmente e o tenant continua sendo identificado pelo JWT.`,
     },
     servers: [
       {
