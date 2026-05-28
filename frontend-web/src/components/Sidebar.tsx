@@ -88,7 +88,7 @@ export default function Sidebar() {
 
     apiFetch("/api/v1/usuarios/me/perfil")
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => { if (data?.nivel >= 5) setPodeAdmin(true); })
+      .then((data) => { if (data?.perfil === "GESTOR" || data?.perfil === "ADMIN") setPodeAdmin(true); })
       .catch(() => {});
   }, []);
 
