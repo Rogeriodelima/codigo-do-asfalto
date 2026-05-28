@@ -43,13 +43,19 @@ export default function LoginPage() {
           ? tenantData
           : (tenantData.tenants ?? []);
 
-        if (tenants.length > 1) {
-          router.push("/selecionar-tenant");
-          return;
-        }
         if (tenants.length === 1) {
-          localStorage.setItem("tenant_id", String(tenants[0].id));
+          const selRes = await apiFetch("/api/v1/usuarios/selecionar-tenant", {
+            method: "POST",
+            body: JSON.stringify({ tenant_id: tenants[0].id }),
+          });
+          if (selRes.ok) {
+            const selData = await selRes.json();
+            localStorage.setItem("token", selData.token);
+            localStorage.setItem("usuario", JSON.stringify(selData.usuario));
+            localStorage.setItem("tenant_id", String(tenants[0].id));
+          }
         }
+        // >1 tenants: segue com o token pré-seleção; o dashboard lida com a ausência de tenant
       }
 
       router.push("/dashboard");
