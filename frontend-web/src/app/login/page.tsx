@@ -39,12 +39,26 @@ export default function LoginPage() {
       const tenantRes = await apiFetch("/api/v1/usuarios/me/tenants");
       if (tenantRes.ok) {
         const tenantData = await tenantRes.json();
-        const tenants = Array.isArray(tenantData)
+        const tenants: { id: number; padrao?: boolean }[] = Array.isArray(tenantData)
           ? tenantData
           : (tenantData.tenants ?? []);
 
-        if (tenants.length === 1) {
-          localStorage.setItem("tenant_id", String(tenants[0].id));
+        if (tenants.length > 0) {
+          const tenant = tenants.find((t) => t.padrao) ?? tenants[0];
+
+          const selRes = await apiFetch("/api/v1/usuarios/selecionar-tenant", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tenant_id: tenant.id }),
+          });
+
+          if (selRes.ok) {
+            const selData = await selRes.json();
+            localStorage.setItem("token", selData.token);
+            localStorage.setItem("usuario", JSON.stringify(selData.usuario));
+          }
+
+          localStorage.setItem("tenant_id", String(tenant.id));
         }
       }
 
