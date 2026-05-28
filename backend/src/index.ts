@@ -14,6 +14,7 @@ import validacoesRoutes from "./api/v1/validacoes/validacoes.routes";
 import evolucaoRoutes from "./api/v1/evolucao/evolucao.routes";
 import conteudosRoutes from "./api/v1/conteudos/conteudos.routes";
 import usuariosRoutes from "./api/v1/usuarios/usuarios.routes";
+import auditoriaRoutes from "./api/v1/auditoria/auditoria.routes";
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use("/api/v1/validacoes", validacoesRoutes);
 app.use("/api/v1/evolucao", evolucaoRoutes);
 app.use("/api/v1/conteudos", conteudosRoutes);
 app.use("/api/v1/usuarios", usuariosRoutes);
+app.use("/api/v1/auditoria", auditoriaRoutes);
 
 // Documentacao Swagger
 app.use('/api/docs',
@@ -70,7 +72,7 @@ app.use('/api/docs',
 );
 
 console.log(
-  "Rotas registradas: auth, perfil, equipamentos, convites, experiencias, validacoes, evolucao, usuarios",
+  "Rotas registradas: auth, perfil, equipamentos, convites, experiencias, validacoes, evolucao, usuarios, auditoria",
 );
 
 // Health check
