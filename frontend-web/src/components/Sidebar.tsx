@@ -79,9 +79,21 @@ export default function Sidebar() {
   const [tooltip, setTooltip] = useState<string | null>(null);
   const [modoAdmin, setModoAdmin] = useState(false);
   const [podeAdmin, setPodeAdmin] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (mobile) setEstado("oculta");
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     setModoAdmin(localStorage.getItem("modoAdmin") === "true");
@@ -116,7 +128,7 @@ export default function Sidebar() {
 
   function navegar(href: string) {
     router.push(href);
-    setEstado("recolhida");
+    setEstado(isMobile ? "oculta" : "recolhida");
   }
 
   function sair() {
@@ -164,6 +176,30 @@ export default function Sidebar() {
   }
 
   if (estado === "oculta") {
+    if (isMobile) {
+      return (
+        <button
+          onClick={() => setEstado("expandida")}
+          style={{
+            position: "fixed",
+            top: "12px",
+            left: "12px",
+            zIndex: 200,
+            background: cor.bg,
+            border: `1px solid ${cor.borda}`,
+            borderRadius: "8px",
+            cursor: "pointer",
+            color: cor.texto,
+            padding: "8px",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Menu size={20} strokeWidth={1.75} />
+        </button>
+      );
+    }
+
     return (
       <div
         style={{
@@ -196,6 +232,18 @@ export default function Sidebar() {
 
   return (
     <>
+      {isMobile && (
+        <div
+          onClick={() => setEstado("oculta")}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 149,
+          }}
+        />
+      )}
+
       <style>{`
         @media (max-width: 1024px) {
           .sidebar-aside {
@@ -209,7 +257,6 @@ export default function Sidebar() {
           .main-conteudo {
             width: 100% !important;
             min-width: 0 !important;
-            padding-left: 56px;
           }
         }
 
@@ -311,7 +358,9 @@ export default function Sidebar() {
           >
             <button
               onClick={() =>
-                setEstado(estado === "expandida" ? "recolhida" : "expandida")
+                setEstado(estado === "expandida"
+                  ? (isMobile ? "oculta" : "recolhida")
+                  : "expandida")
               }
               style={{
                 background: "transparent",

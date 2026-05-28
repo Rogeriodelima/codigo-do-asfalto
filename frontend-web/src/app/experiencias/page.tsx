@@ -146,7 +146,12 @@ export default function ExperienciasPage() {
         .input { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; }
         .select { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; cursor: pointer; }
         .textarea { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; resize: vertical; min-height: 80px; }
-        @media (max-width: 768px) { .topbar { padding: 1rem; } .conteudo { padding: 1rem; } }
+        @media (max-width: 768px) {
+          .topbar { padding: 1rem; }
+          .conteudo { padding: 1rem; }
+          .exp-header { flex-wrap: wrap; gap: 8px; }
+          .exp-actions { margin-left: 0 !important; flex-direction: row !important; }
+        }
       `}</style>
 
       <div
@@ -274,6 +279,7 @@ export default function ExperienciasPage() {
                       )}
                     </div>
                     <div
+                      className="exp-actions"
                       style={{
                         display: "flex",
                         flexDirection: "column",

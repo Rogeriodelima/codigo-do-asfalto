@@ -374,6 +374,12 @@ export default function PerfilPage() {
 
   return (
     <AppLayout>
+      <style>{`
+        @media (max-width: 640px) {
+          .perfil-grid-2col { grid-template-columns: 1fr !important; }
+          .perfil-container { padding: 24px 16px !important; }
+        }
+      `}</style>
       <div
         style={{
           background: t.fundo,
@@ -382,7 +388,7 @@ export default function PerfilPage() {
           minHeight: "100dvh",
         }}
       >
-        <div style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 24px", width: "100%" }}>
+        <div className="perfil-container" style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 24px", width: "100%" }}>
           <div style={{ marginBottom: "32px" }}>
             <h1
               style={{
@@ -507,7 +513,7 @@ export default function PerfilPage() {
             </div>
 
             <form onSubmit={salvarPerfil}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+              <div className="perfil-grid-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
                   <label style={labelStyle}>Nome completo</label>
                   <input
