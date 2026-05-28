@@ -5,6 +5,7 @@ import {
   getChaveAtiva,
   encrypt,
 } from "../../../utils/crypto";
+import { uploadArquivo, deletarArquivo } from "../../../utils/storage";
 
 // =============================================
 // BUSCAR PERFIL
@@ -100,4 +101,51 @@ export async function atualizarPerfil(
   });
 
   return { message: "Perfil atualizado com sucesso" };
+}
+
+// =============================================
+// ATUALIZAR FOTO DE PERFIL
+// =============================================
+
+export async function atualizarFotoPerfil(
+  usuario_id: number,
+  tenant_id: number,
+  buffer: Buffer,
+  contentType: string,
+  extensao: string,
+): Promise<string> {
+  const nomeArquivo = `fotos-perfil/${usuario_id}-${Date.now()}.${extensao}`;
+
+  // Remove foto anterior do R2 se existir e for do mesmo bucket
+  const usuario = await prisma.usuario.findUnique({
+    where: { id: usuario_id },
+    select: { foto_url: true },
+  });
+
+  const publicUrl = process.env.R2_PUBLIC_URL ?? "";
+  if (usuario?.foto_url && publicUrl && usuario.foto_url.startsWith(publicUrl)) {
+    const chaveAntiga = usuario.foto_url.replace(`${publicUrl}/`, "");
+    await deletarArquivo(chaveAntiga).catch(() => {});
+  }
+
+  const url = await uploadArquivo(buffer, nomeArquivo, contentType);
+
+  await prisma.usuario.update({
+    where: { id: usuario_id },
+    data: { foto_url: url },
+  });
+
+  await prisma.auditoriaLog.create({
+    data: {
+      tenant_id,
+      usuario_id,
+      tipo_log: "ACAO",
+      tabela: "usuarios",
+      registro_id: usuario_id,
+      acao: "UPDATE_FOTO_PERFIL",
+      valor_novo: { foto_url: url },
+    },
+  });
+
+  return url;
 }
