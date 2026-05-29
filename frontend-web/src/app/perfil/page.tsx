@@ -263,7 +263,7 @@ export default function PerfilPage() {
 
   const labelStyle: React.CSSProperties = {
     display: "block",
-    fontSize: "11px",
+    fontSize: "12px",
     color: t.labelCor,
     fontWeight: t.labelPeso,
     letterSpacing: "2px",
@@ -278,7 +278,7 @@ export default function PerfilPage() {
     borderRadius: "10px",
     padding: "14px 18px",
     color: t.textoPrincipal,
-    fontSize: "15px",
+    fontSize: "16px",
     outline: "none",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     boxSizing: "border-box",
@@ -298,8 +298,8 @@ export default function PerfilPage() {
     border: "none",
     borderRadius: "10px",
     padding: "13px 24px",
-    fontSize: "12px",
-    fontWeight: "800",
+    fontSize: "13px",
+    fontWeight: "700",
     letterSpacing: "2px",
     textTransform: "uppercase",
     cursor: "pointer",
@@ -312,8 +312,8 @@ export default function PerfilPage() {
     border: `1px solid ${t.borda}`,
     borderRadius: "8px",
     padding: "8px 14px",
-    fontSize: "12px",
-    fontWeight: "600",
+    fontSize: "13px",
+    fontWeight: "500",
     cursor: "pointer",
     fontFamily: "Plus Jakarta Sans, sans-serif",
   };
@@ -330,7 +330,7 @@ export default function PerfilPage() {
 
   if (carregando) {
     return (
-      <AppLayout>
+      <AppLayout titulo="MEU PERFIL">
         <div
           style={{
             width: "100%",
@@ -353,7 +353,7 @@ export default function PerfilPage() {
 
   if (erroGlobal) {
     return (
-      <AppLayout>
+      <AppLayout titulo="MEU PERFIL">
         <div
           style={{
             width: "100%",
@@ -373,7 +373,7 @@ export default function PerfilPage() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout titulo="MEU PERFIL">
       <style>{`
         @media (max-width: 640px) {
           .perfil-grid-2col { grid-template-columns: 1fr !important; }
@@ -607,7 +607,14 @@ export default function PerfilPage() {
             </form>
           </div>
 
-          <div style={cardStyle}>
+          <div
+            style={{
+              background: t.fundo,
+              borderTop: `1px solid ${t.borda}`,
+              paddingTop: "24px",
+              marginBottom: "24px",
+            }}
+          >
             <div
               style={{
                 display: "flex",
@@ -619,7 +626,7 @@ export default function PerfilPage() {
               <h2
                 style={{
                   fontFamily: "Anton, sans-serif",
-                  fontSize: "1rem",
+                  fontSize: "13px",
                   letterSpacing: "2px",
                   color: t.textoPrincipal,
                 }}
@@ -643,7 +650,7 @@ export default function PerfilPage() {
                   textAlign: "center",
                   padding: "32px 0",
                   color: t.textoSecundario,
-                  fontSize: "14px",
+                  fontSize: "15px",
                   fontFamily: "Plus Jakarta Sans, sans-serif",
                 }}
               >
@@ -651,7 +658,7 @@ export default function PerfilPage() {
               </div>
             ) : (
               motos.map((moto) => (
-                <div key={moto.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "16px", border: `1px solid ${t.borda}`, borderRadius: "12px", marginBottom: "10px", background: t.fundo, flexWrap: "wrap" }}>
+                <div key={moto.id} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "16px 0", borderTop: `0.5px solid ${t.borda}`, flexWrap: "wrap" }}>
                   {/* Thumbnail */}
                   <div
                     onClick={() => !uploadandoFotoMoto[moto.id] && inputFotoMotoRefs.current[moto.id]?.click()}

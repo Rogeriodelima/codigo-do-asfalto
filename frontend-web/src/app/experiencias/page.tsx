@@ -128,26 +128,25 @@ export default function ExperienciasPage() {
     );
 
   return (
-    <AppLayout>
+    <AppLayout titulo="MINHAS EXPERIÊNCIAS">
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .pagina { min-height: 100vh; font-family: Plus Jakarta Sans, sans-serif; }
-        .topbar { border-bottom: 1px solid ${t.borda}; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
         .conteudo { padding: 2rem; max-width: 900px; margin: 0 auto; }
-        .card { border: 1px solid ${t.borda}; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+        .cards-lista > .card { border-top: 0.5px solid ${t.borda}; padding: 1.25rem 0; }
+        .cards-lista > .card:first-child { border-top: none; }
         .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
         .badge { padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
-        .btn-primary { background: #F2B705; color: #0B1F3A; border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 0.8125rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
-        .btn-secondary { background: transparent; color: ${t.textoSecundario}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 0.8125rem; font-weight: 600; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
+        .btn-primary { background: #F2B705; color: #0B1F3A; border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 13px; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
+        .btn-secondary { background: transparent; color: ${t.textoSecundario}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 13px; font-weight: 500; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
         .overlay {position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
         .modal { background: ${t.fundoCard}; border: 1px solid ${t.borda}; border-radius: 16px; padding: 2rem; width: 100%; max-width: 480px; margin: auto; position: relative; z-index: 2001;}
         .campo { margin-bottom: 1rem; }
-        .label { display: block; font-size: 0.75rem; font-weight: 700; color: ${t.textoSecundario}; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .input { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; }
-        .select { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; cursor: pointer; }
-        .textarea { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 1rem; outline: none; font-family: Plus Jakarta Sans, sans-serif; resize: vertical; min-height: 80px; }
+        .label { display: block; font-size: 12px; font-weight: 700; color: ${t.textoSecundario}; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .input { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 16px; outline: none; font-family: Plus Jakarta Sans, sans-serif; }
+        .select { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 16px; outline: none; font-family: Plus Jakarta Sans, sans-serif; cursor: pointer; }
+        .textarea { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 16px; outline: none; font-family: Plus Jakarta Sans, sans-serif; resize: vertical; min-height: 80px; }
         @media (max-width: 768px) {
-          .topbar { padding: 1rem; }
           .conteudo { padding: 1rem; }
           .exp-header { flex-wrap: wrap; gap: 8px; }
           .exp-actions { margin-left: 0 !important; flex-direction: row !important; }
@@ -229,7 +228,8 @@ export default function ExperienciasPage() {
               </div>
             </div>
           ) : (
-            experiencias.map((exp) => {
+            <div className="cards-lista">
+            {experiencias.map((exp) => {
               const status = STATUS_CONFIG[exp.status_validacao] || {
                 cor: "#8FA3B8",
                 label: exp.status_validacao,
@@ -238,7 +238,6 @@ export default function ExperienciasPage() {
                 <div
                   key={exp.id}
                   className="card"
-                  style={{ background: t.fundoCard }}
                 >
                   <div className="exp-header">
                     <div style={{ flex: 1 }}>
@@ -313,7 +312,8 @@ export default function ExperienciasPage() {
                   </div>
                 </div>
               );
-            })
+            })}
+            </div>
           )}
         </div>
       </div>

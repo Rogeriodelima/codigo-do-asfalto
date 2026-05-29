@@ -110,7 +110,7 @@ export default function DashboardPage() {
     );
 
   return (
-    <AppLayout>
+    <AppLayout titulo="PAINEL">
       <style>{`
   * {
     box-sizing: border-box;

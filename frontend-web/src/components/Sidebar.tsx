@@ -23,6 +23,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 type TamanhoFonte = "normal" | "grande" | "maior";
 type EstadoSidebar = "oculta" | "recolhida" | "expandida";
@@ -80,6 +81,9 @@ export default function Sidebar() {
   const [modoAdmin, setModoAdmin] = useState(false);
   const [podeAdmin, setPodeAdmin] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const { abrirRef } = useSidebarContext();
+  abrirRef.current = () => setEstado("expandida");
 
   const router = useRouter();
   const pathname = usePathname();
@@ -176,29 +180,7 @@ export default function Sidebar() {
   }
 
   if (estado === "oculta") {
-    if (isMobile) {
-      return (
-        <button
-          onClick={() => setEstado("expandida")}
-          style={{
-            position: "fixed",
-            top: "12px",
-            left: "12px",
-            zIndex: 200,
-            background: cor.bg,
-            border: `1px solid ${cor.borda}`,
-            borderRadius: "8px",
-            cursor: "pointer",
-            color: cor.texto,
-            padding: "8px",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Menu size={20} strokeWidth={1.75} />
-        </button>
-      );
-    }
+    if (isMobile) return null; // TopBar tem o hambúrguer no mobile
 
     return (
       <div
@@ -290,13 +272,14 @@ export default function Sidebar() {
         <div
           style={{
             borderBottom: `1px solid ${cor.borda}`,
-            minHeight: "52px",
+            minHeight: estado === "recolhida" ? "84px" : "52px",
             flexShrink: 0,
             display: "flex",
+            flexDirection: estado === "recolhida" ? "column" : "row",
             alignItems: "center",
             justifyContent: estado === "expandida" ? "space-between" : "center",
-            padding: estado === "expandida" ? "0 12px" : "0",
-            gap: "8px",
+            padding: estado === "expandida" ? "0 12px" : estado === "recolhida" ? "12px 0" : "0",
+            gap: estado === "recolhida" ? "8px" : "0",
           }}
         >
           {estado === "expandida" && (
@@ -394,6 +377,31 @@ export default function Sidebar() {
               </button>
             )}
           </div>
+
+          {estado === "recolhida" && (
+            <div
+              style={{
+                width: "32px",
+                height: "32px",
+                background: "#0B1F3A",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "Anton, sans-serif",
+                  fontSize: "10px",
+                  color: "#F2B705",
+                  letterSpacing: "1px",
+                }}
+              >
+                CDA
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Navegação */}
