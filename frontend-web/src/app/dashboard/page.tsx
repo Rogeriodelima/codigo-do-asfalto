@@ -127,9 +127,7 @@ export default function DashboardPage() {
 
   .conteudo {
     width: 100%;
-    max-width: 1100px;
     padding: 32px;
-    margin: 0 auto;
     min-width: 0;
   }
 

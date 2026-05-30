@@ -373,11 +373,20 @@ export default function PerfilPage() {
   }
 
   return (
-    <AppLayout titulo="MEU PERFIL">
+    <AppLayout titulo="MEU PERFIL" subtitulo={perfil?.tenant?.nome}>
       <style>{`
         @media (max-width: 640px) {
           .perfil-grid-2col { grid-template-columns: 1fr !important; }
-          .perfil-container { padding: 24px 16px !important; }
+        }
+        @media (max-width: 1023px) {
+          .perfil-container { padding: 0 !important; }
+          .perfil-card {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            padding: 24px 16px !important;
+            margin-bottom: 0 !important;
+          }
         }
       `}</style>
       <div
@@ -388,31 +397,8 @@ export default function PerfilPage() {
           minHeight: "100dvh",
         }}
       >
-        <div className="perfil-container" style={{ maxWidth: "720px", margin: "0 auto", padding: "32px 24px", width: "100%" }}>
-          <div style={{ marginBottom: "32px" }}>
-            <h1
-              style={{
-                fontFamily: "Anton, sans-serif",
-                fontSize: "1.75rem",
-                letterSpacing: "2px",
-                color: t.textoPrincipal,
-                marginBottom: "4px",
-              }}
-            >
-              MEU PERFIL
-            </h1>
-            <p
-              style={{
-                color: t.textoSecundario,
-                fontSize: "14px",
-                fontFamily: "Plus Jakarta Sans, sans-serif",
-              }}
-            >
-              {perfil?.tenant?.nome}
-            </p>
-          </div>
-
-          <div style={cardStyle}>
+        <div className="perfil-container" style={{ padding: "32px 24px", width: "100%" }}>
+          <div className="perfil-card" style={cardStyle}>
             <h2
               style={{
                 fontFamily: "Anton, sans-serif",

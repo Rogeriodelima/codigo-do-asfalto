@@ -8,9 +8,10 @@ import { SidebarProvider } from "@/contexts/SidebarContext";
 interface AppLayoutProps {
   children: React.ReactNode;
   titulo?: string;
+  subtitulo?: string;
 }
 
-export default function AppLayout({ children, titulo }: AppLayoutProps) {
+export default function AppLayout({ children, titulo, subtitulo }: AppLayoutProps) {
   const { t } = useTema();
 
   return (
@@ -40,7 +41,7 @@ export default function AppLayout({ children, titulo }: AppLayoutProps) {
           }}
         >
           <div className="topbar-mobile">
-            <TopBar titulo={titulo} />
+            <TopBar titulo={titulo} subtitulo={subtitulo} />
           </div>
           {children}
         </main>

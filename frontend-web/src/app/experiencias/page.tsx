@@ -127,17 +127,20 @@ export default function ExperienciasPage() {
       </div>
     );
 
+  const subtituloExp = `${experiencias.length} experiência${experiencias.length !== 1 ? "s" : ""} registrada${experiencias.length !== 1 ? "s" : ""}`;
+
   return (
-    <AppLayout titulo="MINHAS EXPERIÊNCIAS">
+    <AppLayout titulo="MINHAS EXPERIÊNCIAS" subtitulo={subtituloExp}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         .pagina { min-height: 100vh; font-family: Plus Jakarta Sans, sans-serif; }
-        .conteudo { padding: 2rem; max-width: 900px; margin: 0 auto; }
-        .cards-lista > .card { border-top: 0.5px solid ${t.borda}; padding: 1.25rem 0; }
-        .cards-lista > .card:first-child { border-top: none; }
+        .conteudo { padding: 2rem; }
+        .page-header { display: flex; align-items: center; justify-content: flex-end; padding: 16px 0; margin-bottom: 8px; }
+        .card { background: ${t.fundoCard}; border-top: 1px solid ${t.borda}; border-bottom: 1px solid ${t.borda}; padding: 16px; width: 100%; }
+        .cards-lista .card + .card { border-top: none; }
         .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
         .badge { padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
-        .btn-primary { background: #F2B705; color: #0B1F3A; border: none; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 13px; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
+        .btn-primary { background: #F2B705; color: #0B1F3A; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
         .btn-secondary { background: transparent; color: ${t.textoSecundario}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 13px; font-weight: 500; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
         .overlay {position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto; }
         .modal { background: ${t.fundoCard}; border: 1px solid ${t.borda}; border-radius: 16px; padding: 2rem; width: 100%; max-width: 480px; margin: auto; position: relative; z-index: 2001;}
@@ -159,31 +162,7 @@ export default function ExperienciasPage() {
       >
         {/* Conteúdo */}
         <div className="conteudo">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "2rem",
-            }}
-          >
-            <div>
-              <h1
-                style={{
-                  fontFamily: "Anton, sans-serif",
-                  fontSize: "1.75rem",
-                  letterSpacing: "2px",
-                  marginBottom: "4px",
-                }}
-              >
-                MINHAS EXPERIÊNCIAS
-              </h1>
-              <p style={{ color: t.textoSecundario, fontSize: "0.875rem" }}>
-                {experiencias.length} experiência
-                {experiencias.length !== 1 ? "s" : ""} registrada
-                {experiencias.length !== 1 ? "s" : ""}
-              </p>
-            </div>
+          <div className="page-header">
             <button className="btn-primary" onClick={() => setModal(true)}>
               + REGISTRAR
             </button>

@@ -6,9 +6,10 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 
 interface TopBarProps {
   titulo?: string;
+  subtitulo?: string;
 }
 
-export default function TopBar({ titulo }: TopBarProps) {
+export default function TopBar({ titulo, subtitulo }: TopBarProps) {
   const { t } = useTema();
   const { abrirRef } = useSidebarContext();
 
@@ -93,13 +94,13 @@ export default function TopBar({ titulo }: TopBarProps) {
         <div style={{ flex: 1 }} />
       </div>
 
-      {/* Sub-faixa com título da página */}
+      {/* Sub-faixa com título e subtítulo da página */}
       {titulo && (
         <div
           style={{
             background: t.fundoCard,
             borderBottom: `1px solid ${t.borda}`,
-            padding: "12px 16px",
+            padding: "10px 16px",
           }}
         >
           <span
@@ -109,10 +110,25 @@ export default function TopBar({ titulo }: TopBarProps) {
               letterSpacing: "2px",
               color: t.textoSecundario,
               fontFamily: "Plus Jakarta Sans, sans-serif",
+              display: "block",
             }}
           >
             {titulo}
           </span>
+          {subtitulo && (
+            <span
+              style={{
+                fontSize: "12px",
+                color: t.textoSecundario,
+                fontFamily: "Plus Jakarta Sans, sans-serif",
+                opacity: 0.7,
+                display: "block",
+                marginTop: "2px",
+              }}
+            >
+              {subtitulo}
+            </span>
+          )}
         </div>
       )}
     </div>
