@@ -218,42 +218,30 @@ export default function ExperienciasPage() {
                 >
                   <div
                     style={{
-                      fontSize: "1rem",
-                      fontWeight: "700",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "8px",
                       marginBottom: "4px",
                     }}
                   >
-                    {exp.titulo}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.8125rem",
-                      color: t.textoSecundario,
-                      marginBottom: "8px",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {exp.tipo} ·{" "}
-                    {new Date(exp.data).toLocaleDateString("pt-BR")} ·{" "}
-                    <strong>{tempoRelativo(exp.data)}</strong>
-                    {exp.localizacao && ` · ${exp.localizacao}`}
-                    {exp.distancia_ou_duracao &&
-                      ` · ${exp.distancia_ou_duracao}`}
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      marginBottom: exp.descricao ? "8px" : 0,
-                    }}
-                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        fontSize: "1rem",
+                        fontWeight: "700",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {exp.titulo}
+                    </span>
                     <span
                       className="badge"
                       style={{
                         background: `${status.cor}20`,
                         color: status.cor,
                         border: `1px solid ${status.cor}40`,
+                        flexShrink: 0,
                       }}
                     >
                       {status.label}
@@ -264,11 +252,27 @@ export default function ExperienciasPage() {
                           fontSize: "0.8125rem",
                           fontWeight: "700",
                           color: "#F2B705",
+                          flexShrink: 0,
                         }}
                       >
                         +{exp.pontuacao}pts
                       </span>
                     )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.8125rem",
+                      color: t.textoSecundario,
+                      marginBottom: exp.descricao ? "8px" : 0,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {exp.tipo} ·{" "}
+                    {new Date(exp.data).toLocaleDateString("pt-BR")} ·{" "}
+                    <strong>{tempoRelativo(exp.data)}</strong>
+                    {exp.localizacao && ` · ${exp.localizacao}`}
+                    {exp.distancia_ou_duracao &&
+                      ` · ${exp.distancia_ou_duracao}`}
                   </div>
                   {exp.descricao && (
                     <div
