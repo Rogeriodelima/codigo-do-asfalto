@@ -138,7 +138,6 @@ export default function ExperienciasPage() {
         .page-header { display: flex; align-items: center; justify-content: flex-end; padding: 16px 0; margin-bottom: 8px; }
         .card { background: ${t.fundoCard}; border-top: 1px solid ${t.borda}; border-bottom: 1px solid ${t.borda}; padding: 16px; width: 100%; }
         .cards-lista .card + .card { border-top: none; }
-        .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
         .badge { padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
         .btn-primary { background: #F2B705; color: #0B1F3A; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
         .btn-secondary { background: transparent; color: ${t.textoSecundario}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.75rem 1.5rem; font-size: 13px; font-weight: 500; cursor: pointer; font-family: Plus Jakarta Sans, sans-serif; }
@@ -151,8 +150,7 @@ export default function ExperienciasPage() {
         .textarea { width: 100%; background: ${t.inputBg}; border: 1px solid ${t.borda}; border-radius: 10px; padding: 0.875rem 1rem; color: ${t.textoPrincipal}; font-size: 16px; outline: none; font-family: Plus Jakarta Sans, sans-serif; resize: vertical; min-height: 80px; }
         @media (max-width: 768px) {
           .conteudo { padding: 1rem; }
-          .exp-header { flex-wrap: wrap; gap: 8px; }
-          .exp-actions { margin-left: 0 !important; flex-direction: row !important; }
+          .cards-lista { margin: 0 -1rem; }
         }
       `}</style>
 
@@ -218,77 +216,71 @@ export default function ExperienciasPage() {
                   key={exp.id}
                   className="card"
                 >
-                  <div className="exp-header">
-                    <div style={{ flex: 1 }}>
-                      <div
-                        style={{
-                          fontSize: "1rem",
-                          fontWeight: "700",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        {exp.titulo}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "0.8125rem",
-                          color: t.textoSecundario,
-                          marginBottom: "8px",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        {exp.tipo} ·{" "}
-                        {new Date(exp.data).toLocaleDateString("pt-BR")} ·{" "}
-                        <strong>{tempoRelativo(exp.data)}</strong>
-                        {exp.localizacao && ` · ${exp.localizacao}`}
-                        {exp.distancia_ou_duracao &&
-                          ` · ${exp.distancia_ou_duracao}`}
-                      </div>
-                      {exp.descricao && (
-                        <div
-                          style={{
-                            fontSize: "0.875rem",
-                            color: t.textoSecundario,
-                            lineHeight: "1.5",
-                          }}
-                        >
-                          {exp.descricao}
-                        </div>
-                      )}
-                    </div>
-                    <div
-                      className="exp-actions"
+                  <div
+                    style={{
+                      fontSize: "1rem",
+                      fontWeight: "700",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    {exp.titulo}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.8125rem",
+                      color: t.textoSecundario,
+                      marginBottom: "8px",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {exp.tipo} ·{" "}
+                    {new Date(exp.data).toLocaleDateString("pt-BR")} ·{" "}
+                    <strong>{tempoRelativo(exp.data)}</strong>
+                    {exp.localizacao && ` · ${exp.localizacao}`}
+                    {exp.distancia_ou_duracao &&
+                      ` · ${exp.distancia_ou_duracao}`}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginBottom: exp.descricao ? "8px" : 0,
+                    }}
+                  >
+                    <span
+                      className="badge"
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-end",
-                        gap: "8px",
-                        marginLeft: "1rem",
+                        background: `${status.cor}20`,
+                        color: status.cor,
+                        border: `1px solid ${status.cor}40`,
                       }}
                     >
+                      {status.label}
+                    </span>
+                    {exp.pontuacao && (
                       <span
-                        className="badge"
                         style={{
-                          background: `${status.cor}20`,
-                          color: status.cor,
-                          border: `1px solid ${status.cor}40`,
+                          fontSize: "0.8125rem",
+                          fontWeight: "700",
+                          color: "#F2B705",
                         }}
                       >
-                        {status.label}
+                        +{exp.pontuacao}pts
                       </span>
-                      {exp.pontuacao && (
-                        <span
-                          style={{
-                            fontSize: "0.8125rem",
-                            fontWeight: "700",
-                            color: "#F2B705",
-                          }}
-                        >
-                          +{exp.pontuacao}pts
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
+                  {exp.descricao && (
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        color: t.textoSecundario,
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      {exp.descricao}
+                    </div>
+                  )}
                 </div>
               );
             })}

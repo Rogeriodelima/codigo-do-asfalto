@@ -379,13 +379,18 @@ export default function PerfilPage() {
           .perfil-grid-2col { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 1023px) {
-          .perfil-container { padding: 0 !important; }
+          .perfil-container { padding: 0 !important; overflow-x: hidden; }
           .perfil-card {
             border-radius: 0 !important;
             border-left: none !important;
             border-right: none !important;
             padding: 24px 16px !important;
             margin-bottom: 0 !important;
+          }
+          .motos-secao {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+            overflow-x: hidden;
           }
         }
       `}</style>
@@ -594,6 +599,7 @@ export default function PerfilPage() {
           </div>
 
           <div
+            className="motos-secao"
             style={{
               background: t.fundo,
               borderTop: `1px solid ${t.borda}`,
