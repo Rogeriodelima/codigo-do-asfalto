@@ -377,7 +377,7 @@ export default function ConvitesPage() {
                       style={{
                         fontSize: "12px",
                         color: t.textoSecundario,
-                        marginBottom: "8px",
+                        marginTop: "4px",
                         fontFamily: "Plus Jakarta Sans, sans-serif",
                       }}
                     >
@@ -392,6 +392,7 @@ export default function ConvitesPage() {
                         alignItems: "center",
                         justifyContent: "space-between",
                         gap: "8px",
+                        marginTop: "4px",
                       }}
                     >
                       <div
@@ -401,9 +402,14 @@ export default function ConvitesPage() {
                           fontFamily: "Plus Jakarta Sans, sans-serif",
                         }}
                       >
-                        Expira em{" "}
-                        {new Date(convite.data_expiracao).toLocaleDateString(
-                          "pt-BR",
+                        {(statusExibido === "PENDENTE" ||
+                          statusExibido === "EXPIRADO") && (
+                          <>
+                            Expira em{" "}
+                            {new Date(
+                              convite.data_expiracao,
+                            ).toLocaleDateString("pt-BR")}
+                          </>
                         )}
                       </div>
 
