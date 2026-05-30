@@ -18,11 +18,11 @@ interface Convite {
   created_at: string;
 }
 
-const STATUS_CONFIG: Record<string, { cor: string; label: string }> = {
-  PENDENTE: { cor: "#D97706", label: "Pendente" },
-  USADO: { cor: "#16A34A", label: "Utilizado" },
-  CANCELADO: { cor: "#6B7280", label: "Cancelado" },
-  EXPIRADO: { cor: "#6B7280", label: "Expirado" },
+const STATUS_CONFIG: Record<string, { cor: string; bg: string; label: string }> = {
+  PENDENTE: { cor: "#F2B705", bg: "rgba(242,183,5,0.12)", label: "Pendente" },
+  USADO: { cor: "#16A34A", bg: "rgba(22,163,74,0.10)", label: "Utilizado" },
+  CANCELADO: { cor: "#6B7280", bg: "rgba(107,114,128,0.10)", label: "Cancelado" },
+  EXPIRADO: { cor: "#6B7280", bg: "rgba(107,114,128,0.10)", label: "Expirado" },
 };
 
 export default function ConvitesPage() {
@@ -336,9 +336,16 @@ export default function ConvitesPage() {
               </div>
             ) : (
               convites.map((convite, i) => {
-                const st = STATUS_CONFIG[convite.status] || {
+                const expirado =
+                  new Date(convite.data_expiracao) < new Date();
+                const statusExibido =
+                  expirado && convite.status === "PENDENTE"
+                    ? "EXPIRADO"
+                    : convite.status;
+                const st = STATUS_CONFIG[statusExibido] || {
                   cor: "#6B7280",
-                  label: convite.status,
+                  bg: "rgba(107,114,128,0.10)",
+                  label: statusExibido,
                 };
                 const contato =
                   convite.email_convidado || convite.celular_convidado || "—";
@@ -347,30 +354,46 @@ export default function ConvitesPage() {
                   <div
                     key={convite.id}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "12px",
                       padding: "14px 0",
                       borderTop: i > 0 ? `1px solid ${t.borda}` : "none",
-                      flexWrap: "wrap",
                     }}
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 600,
-                          color: t.textoPrincipal,
-                          marginBottom: "4px",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          fontFamily: "Plus Jakarta Sans, sans-serif",
-                        }}
-                      >
-                        {contato}
-                      </div>
+                    {/* Linha 1 — contato */}
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: 600,
+                        color: t.textoPrincipal,
+                        marginBottom: "4px",
+                        wordBreak: "break-all",
+                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                      }}
+                    >
+                      {contato}
+                    </div>
+
+                    {/* Linha 2 — enviado em */}
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: t.textoSecundario,
+                        marginBottom: "8px",
+                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                      }}
+                    >
+                      Enviado em{" "}
+                      {new Date(convite.created_at).toLocaleDateString("pt-BR")}
+                    </div>
+
+                    {/* Linha 3 — expira + badge + botão */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "8px",
+                      }}
+                    >
                       <div
                         style={{
                           fontSize: "12px",
@@ -383,51 +406,52 @@ export default function ConvitesPage() {
                           "pt-BR",
                         )}
                       </div>
-                    </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <span
+                      <div
                         style={{
-                          padding: "3px 10px",
-                          borderRadius: "99px",
-                          fontSize: "11px",
-                          fontWeight: 600,
-                          letterSpacing: "1px",
-                          background: `${st.cor}20`,
-                          color: st.cor,
-                          border: `1px solid ${st.cor}40`,
-                          fontFamily: "Plus Jakarta Sans, sans-serif",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          flexShrink: 0,
                         }}
                       >
-                        {st.label}
-                      </span>
-
-                      {convite.status === "PENDENTE" && (
-                        <button
-                          onClick={() => cancelarConvite(convite.id)}
-                          disabled={cancelandoId === convite.id}
+                        <span
                           style={{
-                            background: "transparent",
-                            border: `1px solid ${t.erroBorda}`,
-                            borderRadius: "8px",
-                            padding: "6px 12px",
-                            fontSize: "12px",
-                            color: t.erroTexto,
-                            cursor: "pointer",
+                            padding: "3px 10px",
+                            borderRadius: "99px",
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            letterSpacing: "1px",
+                            background: st.bg,
+                            color: st.cor,
+                            border: `1px solid ${st.cor}40`,
                             fontFamily: "Plus Jakarta Sans, sans-serif",
-                            opacity: cancelandoId === convite.id ? 0.5 : 1,
                           }}
                         >
-                          {cancelandoId === convite.id ? "..." : "Cancelar"}
-                        </button>
-                      )}
+                          {st.label}
+                        </span>
+
+                        {convite.status === "PENDENTE" &&
+                          statusExibido !== "EXPIRADO" && (
+                            <button
+                              onClick={() => cancelarConvite(convite.id)}
+                              disabled={cancelandoId === convite.id}
+                              style={{
+                                background: "transparent",
+                                border: `1px solid ${t.erroBorda}`,
+                                borderRadius: "8px",
+                                padding: "6px 12px",
+                                fontSize: "12px",
+                                color: t.erroTexto,
+                                cursor: "pointer",
+                                fontFamily: "Plus Jakarta Sans, sans-serif",
+                                opacity: cancelandoId === convite.id ? 0.5 : 1,
+                              }}
+                            >
+                              {cancelandoId === convite.id ? "..." : "Cancelar"}
+                            </button>
+                          )}
+                      </div>
                     </div>
                   </div>
                 );
