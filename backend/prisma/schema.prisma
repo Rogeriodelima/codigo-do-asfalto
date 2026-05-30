@@ -50,6 +50,7 @@ model Tenant {
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime?
+  requer_aprovacao      Boolean @default(false)
   convite_expiracao_dias Int @default(7)
   validacao_sla_horas           Int @default(36)
   validacao_escalonamento_horas Int @default(12)
@@ -155,6 +156,7 @@ enum PerfilTenant {
 }
 
 enum StatusUsuarioTenant {
+  PENDENTE_APROVACAO
   ATIVO
   SUSPENSO
   CANCELADO
