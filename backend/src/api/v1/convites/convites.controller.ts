@@ -11,10 +11,8 @@ export async function postValidarConvite(req: Request, res: Response) {
   try {
     const { codigo, email } = req.body;
 
-    if (!codigo || !email) {
-      return res.status(400).json({
-        error: "Campos obrigatorios: codigo, email",
-      });
+    if (!codigo) {
+      return res.status(400).json({ error: "Campo obrigatorio: codigo" });
     }
 
     const resultado = await validarConvite({ codigo, email });
@@ -30,17 +28,31 @@ export async function postConvite(req: Request, res: Response) {
   try {
     const gerado_por = req.usuario!.id;
     const tenant_id = req.usuario!.tenant_id;
-    const { email_convidado, celular_convidado } = req.body;
+    const { email_convidado, celular_convidado, canal } = req.body;
 
-    if (!email_convidado) {
+    const CANAIS_VALIDOS = ["EMAIL", "WHATSAPP", "AMBOS"];
+    if (!canal || !CANAIS_VALIDOS.includes(canal)) {
       return res.status(400).json({
-        error: "Campo obrigatorio: email_convidado",
+        error: "Campo obrigatorio: canal (EMAIL, WHATSAPP ou AMBOS)",
+      });
+    }
+
+    if ((canal === "EMAIL" || canal === "AMBOS") && !email_convidado) {
+      return res.status(400).json({
+        error: "Campo obrigatorio: email_convidado para canal EMAIL ou AMBOS",
+      });
+    }
+
+    if ((canal === "WHATSAPP" || canal === "AMBOS") && !celular_convidado) {
+      return res.status(400).json({
+        error: "Campo obrigatorio: celular_convidado para canal WHATSAPP ou AMBOS",
       });
     }
 
     const resultado = await gerarConvite(gerado_por, tenant_id, {
       email_convidado,
       celular_convidado,
+      canal,
     });
 
     return res.status(201).json(resultado);

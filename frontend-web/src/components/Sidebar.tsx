@@ -34,6 +34,7 @@ const NAV_ITEMS = [
   { href: "/timeline", icon: GitBranch, label: "Timeline" },
   { href: "/evolucao", icon: TrendingUp, label: "Evolução" },
   { href: "/perfil", icon: User, label: "Perfil" },
+  { href: "/convites", icon: UserPlus, label: "Convites" },
 ];
 
 const NAV_ADMIN_ITEMS = [

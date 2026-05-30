@@ -13,6 +13,7 @@ export async function enviarEmailConvite(dados: {
   tenant_nome: string;
   codigo: string;
   data_expiracao: Date;
+  link: string;
 }) {
   const dataFormatada = dados.data_expiracao.toLocaleDateString("pt-BR");
 
@@ -37,19 +38,21 @@ export async function enviarEmailConvite(dados: {
             <strong>${dados.tenant_nome}</strong> no Codigo do Asfalto.
           </p>
 
-          <p style="color: #4A6278; font-size: 15px; line-height: 1.6;">
-            Use o codigo abaixo para criar sua conta:
-          </p>
-
-          <div style="background: #F0F4F8; border: 2px solid #F2B705; border-radius: 12px;
-                      padding: 24px; text-align: center; margin: 24px 0;">
-            <p style="color: #8FA3B8; font-size: 12px; letter-spacing: 2px;
-                      text-transform: uppercase; margin: 0 0 8px;">Seu codigo de convite</p>
-            <p style="color: #0B1F3A; font-size: 32px; font-weight: bold;
-                      letter-spacing: 4px; margin: 0;">${dados.codigo}</p>
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${dados.link}"
+               style="background: #F2B705; color: #0B1F3A; text-decoration: none;
+                      padding: 16px 32px; border-radius: 10px; font-weight: bold;
+                      font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+                      display: inline-block;">
+              ACEITAR CONVITE
+            </a>
           </div>
 
-          <p style="color: #8FA3B8; font-size: 13px;">
+          <p style="color: #4A6278; font-size: 14px; line-height: 1.6; text-align: center;">
+            Ou use o codigo: <strong style="letter-spacing: 3px;">${dados.codigo}</strong>
+          </p>
+
+          <p style="color: #8FA3B8; font-size: 13px; text-align: center; margin-top: 16px;">
             Este convite expira em <strong>${dataFormatada}</strong>.
           </p>
 

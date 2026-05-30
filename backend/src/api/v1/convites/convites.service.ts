@@ -7,6 +7,7 @@ import {
 } from "../../../utils/crypto";
 import { randomBytes } from "crypto";
 import { enviarEmailConvite } from "../../../utils/email";
+import { enviarWhatsappConvite } from "../../../utils/whatsapp";
 
 // =============================================
 // VALIDAR CONVITE (pré-cadastro, sem autenticação)
@@ -14,7 +15,7 @@ import { enviarEmailConvite } from "../../../utils/email";
 
 export async function validarConvite(dados: {
   codigo: string;
-  email: string;
+  email?: string;
 }) {
   const convite = await prisma.convite.findFirst({
     where: {
@@ -32,16 +33,18 @@ export async function validarConvite(dados: {
     throw new Error("Convite invalido, expirado ou ja utilizado");
   }
 
-  // O email_convidado é criptografado com IV aleatório — não é possível comparar
-  // diretamente no banco. Descriptografa para comparar em memória.
-  let emailConvite = convite.email_convidado;
-  if (convite.chave_cripto_id) {
-    const chave = await getChavePorId(prisma as any, convite.chave_cripto_id);
-    emailConvite = decrypt(convite.email_convidado, chave);
-  }
+  // Valida email apenas se fornecido no body e se ha email armazenado no convite
+  if (dados.email && convite.email_convidado) {
+    // O email_convidado é criptografado com IV aleatório — descriptografa para comparar
+    let emailConvite = convite.email_convidado;
+    if (convite.chave_cripto_id) {
+      const chave = await getChavePorId(prisma as any, convite.chave_cripto_id);
+      emailConvite = decrypt(convite.email_convidado, chave);
+    }
 
-  if (emailConvite.toLowerCase() !== dados.email.toLowerCase()) {
-    throw new Error("Email nao corresponde ao convite");
+    if (emailConvite.toLowerCase() !== dados.email.toLowerCase()) {
+      throw new Error("Email nao corresponde ao convite");
+    }
   }
 
   return {
@@ -58,11 +61,11 @@ export async function gerarConvite(
   gerado_por: number,
   tenant_id: number,
   dados: {
-    email_convidado: string;
+    email_convidado?: string;
     celular_convidado?: string;
+    canal: "EMAIL" | "WHATSAPP" | "AMBOS";
   },
 ) {
-  // Busca configuracao de expiracao do tenant
   const tenant = await prisma.tenant.findUnique({
     where: { id: tenant_id },
   });
@@ -71,58 +74,52 @@ export async function gerarConvite(
     throw new Error("Tenant nao encontrado");
   }
 
-  // Verifica se ja existe convite pendente para este email neste tenant
-  const conviteExistente = await prisma.convite.findFirst({
-    where: {
-      email_convidado: dados.email_convidado,
-      tenant_id,
-      status: "PENDENTE",
-      deleted_at: null,
-    },
-  });
-
-  if (conviteExistente) {
-    throw new Error(
-      "Ja existe um convite pendente para este email neste tenant",
-    );
-  }
-
-  // Verifica se usuario ja e membro deste tenant
-  const usuarioExistente = await prisma.usuario.findFirst({
-    where: {
-      email: dados.email_convidado,
-      tenants: {
-        some: { tenant_id, status: "ATIVO" },
+  // Verificacoes de duplicata — apenas quando email e fornecido
+  if (dados.email_convidado) {
+    const conviteExistente = await prisma.convite.findFirst({
+      where: {
+        email_convidado: dados.email_convidado,
+        tenant_id,
+        status: "PENDENTE",
+        deleted_at: null,
       },
-    },
-  });
+    });
 
-  if (usuarioExistente) {
-    throw new Error("Este email ja e membro deste tenant");
+    if (conviteExistente) {
+      throw new Error("Ja existe um convite pendente para este email neste tenant");
+    }
+
+    const usuarioExistente = await prisma.usuario.findFirst({
+      where: {
+        email: dados.email_convidado,
+        tenants: { some: { tenant_id, status: "ATIVO" } },
+      },
+    });
+
+    if (usuarioExistente) {
+      throw new Error("Este email ja e membro deste tenant");
+    }
   }
 
   // Calcula data de expiracao
   const dataExpiracao = new Date();
   if (tenant.convite_expiracao_dias > 0) {
-    dataExpiracao.setDate(
-      dataExpiracao.getDate() + tenant.convite_expiracao_dias,
-    );
+    dataExpiracao.setDate(dataExpiracao.getDate() + tenant.convite_expiracao_dias);
   } else {
-    // Sem expiracao - define para 100 anos
     dataExpiracao.setFullYear(dataExpiracao.getFullYear() + 100);
   }
 
-  // Gera codigo unico
   const codigo = randomBytes(8).toString("hex").toUpperCase();
 
   // Criptografa dados sensiveis
   const chave = await getChaveAtiva(prisma as any);
-  const emailEnc = encrypt(dados.email_convidado, chave.key);
+  const emailEnc = dados.email_convidado
+    ? encrypt(dados.email_convidado, chave.key)
+    : "";
   const celularEnc = dados.celular_convidado
     ? encrypt(dados.celular_convidado, chave.key)
     : null;
 
-  // Cria o convite
   const convite = await prisma.convite.create({
     data: {
       tenant_id,
@@ -136,7 +133,6 @@ export async function gerarConvite(
     },
   });
 
-  // Log de auditoria
   await prisma.auditoriaLog.create({
     data: {
       tenant_id,
@@ -145,28 +141,42 @@ export async function gerarConvite(
       tabela: "convites",
       registro_id: convite.id,
       acao: "CREATE_CONVITE",
-      valor_novo: { email_convidado: dados.email_convidado },
+      valor_novo: { email_convidado: dados.email_convidado, canal: dados.canal },
     },
   });
 
-  // Envia email com o codigo
   const gerador = await prisma.usuario.findUnique({
     where: { id: gerado_por },
     select: { nome: true },
   });
 
-  await enviarEmailConvite({
-    email_destinatario: dados.email_convidado,
-    nome_convidador: gerador?.nome || "Um membro",
-    tenant_nome: tenant.nome,
-    codigo,
-    data_expiracao: dataExpiracao,
-  });
+  const link = `${process.env.APP_URL}/cadastro?codigo=${codigo}`;
+  const nomeConvidador = gerador?.nome || "Um membro";
+
+  if (dados.canal === "EMAIL" || dados.canal === "AMBOS") {
+    await enviarEmailConvite({
+      email_destinatario: dados.email_convidado!,
+      nome_convidador: nomeConvidador,
+      tenant_nome: tenant.nome,
+      codigo,
+      data_expiracao: dataExpiracao,
+      link,
+    });
+  }
+
+  if ((dados.canal === "WHATSAPP" || dados.canal === "AMBOS") && dados.celular_convidado) {
+    await enviarWhatsappConvite({
+      celular: dados.celular_convidado,
+      nome_convidador: nomeConvidador,
+      tenant_nome: tenant.nome,
+      link,
+    });
+  }
 
   return {
     id: convite.id,
     codigo: convite.codigo,
-    email_convidado: dados.email_convidado,
+    email_convidado: dados.email_convidado || null,
     data_expiracao: convite.data_expiracao,
     message: "Convite gerado com sucesso",
   };
@@ -188,15 +198,18 @@ export async function listarConvites(usuario_id: number, tenant_id: number) {
 
   const resultado = await Promise.all(
     convites.map(async (c: any) => {
-      let email = c.email_convidado;
+      let email = c.email_convidado || null;
+      let celular = c.celular_convidado || null;
       if (c.chave_cripto_id) {
         const chave = await getChavePorId(prisma as any, c.chave_cripto_id);
-        email = decrypt(c.email_convidado, chave);
+        if (email) email = decrypt(email, chave);
+        if (celular) celular = decrypt(celular, chave);
       }
       return {
         id: c.id,
         codigo: c.codigo,
-        email_convidado: email,
+        email_convidado: email || null,
+        celular_convidado: celular || null,
         status: c.status,
         data_expiracao: c.data_expiracao,
         data_uso: c.data_uso,

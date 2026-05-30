@@ -122,3 +122,45 @@ Acesse o app para ver detalhes.`;
 
   await enviarMensagem(dados.telefone, mensagem);
 }
+
+// =============================================
+// CONVITE VIA WHATSAPP
+// =============================================
+
+export async function enviarWhatsappConvite({
+  celular,
+  nome_convidador,
+  tenant_nome,
+  link,
+}: {
+  celular: string;
+  nome_convidador: string;
+  tenant_nome: string;
+  link: string;
+}) {
+  const mensagem = `Olá! ${nome_convidador} te convidou para fazer parte do ${tenant_nome} no Código do Asfalto.\n\nAcesse o link abaixo para criar sua conta:\n${link}\n\nO convite é pessoal e intransferível.`;
+
+  try {
+    if (UAZAPI_TOKEN === "mock_token") {
+      console.log(`[WHATSAPP MOCK] Convite para: ${celular}`);
+      console.log(`[WHATSAPP MOCK] Mensagem: ${mensagem}`);
+      return;
+    }
+
+    await fetch(`${UAZAPI_URL}/send/text`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token: UAZAPI_TOKEN,
+        instance: UAZAPI_INSTANCE,
+      },
+      body: JSON.stringify({
+        phone: celular,
+        message: mensagem,
+      }),
+    });
+  } catch (err) {
+    console.error("Erro ao enviar WhatsApp de convite:", err);
+    // Nao lanca erro — convite ja foi criado no banco
+  }
+}
